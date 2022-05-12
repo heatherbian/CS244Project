@@ -1,1 +1,2 @@
 # CS244Project
+Our project is implementing a decentralized chat messenger application that enables data sovereignty, delivering data ownership and control for both on-premise and cloud deployments. The implementation will be based on the Matrix protocol, and we will implement the message synchronization mechanism between servers from scratch. We aim to ensure causal consistency and high availability in our implementation. If time permits, we may implement a graphic UI for our system.
