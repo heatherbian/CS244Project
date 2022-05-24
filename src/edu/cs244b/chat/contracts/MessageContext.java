@@ -1,5 +1,6 @@
 package edu.cs244b.chat.contracts;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 public class MessageContext {
@@ -9,35 +10,47 @@ public class MessageContext {
 	 * the ids of persons whom the app owner is chatting with
 	 */
 	List<String> userIds;
-	
+
 	/**
 	 * the id of person who is signing the app
 	 */
 	String ownerId;
-	
+
 	/**
 	 * ids of messages that are prior to the message
 	 */
 	List<String> parentMessageId;
-	
+
 	/**
-	 * the id of the specific message. For the time being, we could use Timestamp as for comparison
+	 * the id of the specific message.
 	 */
 	String messageId;
-	
+
+	/**
+	 *  the timestamp of the message
+	 */
+	Timestamp timestamp;
+
+	/**
+	 * the depth of the message on the event graph
+	 */
+	int depth;
+
 	/**
 	 * the actual content of the specific message
 	 */
 	String messageContent;
 
 	public MessageContext(String roomId, List<String> userIds, String ownerId, List<String> parentMessageId, String messageId,
-			String messageContent) {
+			Timestamp timestamp, int depth,String messageContent) {
 		super();
 		this.roomId = roomId;
 		this.userIds = userIds;
 		this.ownerId = ownerId;
 		this.parentMessageId = parentMessageId;
 		this.messageId = messageId;
+		this.timestamp = timestamp;
+		this.depth = depth;
 		this.messageContent = messageContent;
 	}
 
@@ -80,6 +93,14 @@ public class MessageContext {
 	public void setMessageId(String messageId) {
 		this.messageId = messageId;
 	}
+
+	public Timestamp getTimestamp() { return timestamp; }
+
+	public void setTimestamp(Timestamp timestamp) { this.timestamp = timestamp; }
+
+	public int getDepth() { return depth; }
+
+	public void setDepth(int depth) { this.depth = depth; }
 
 	public String getMessageContent() {
 		return messageContent;
