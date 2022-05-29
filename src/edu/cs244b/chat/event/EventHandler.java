@@ -7,17 +7,12 @@ import edu.cs244b.chat.contracts.IEventHandler;
 import edu.cs244b.chat.contracts.MessageContext;
 
 public class EventHandler implements IEventHandler {
-
+    // Data structure definitions
 	public class Room {
 		public String roomId;
-		public ArrayList<User> users;
+		public ArrayList<String> userIds;
 		public ArrayList<Server> servers;
 		public EventGraph eventGraph;
-	}
-
-	public class User {
-		public String id;
-		public String username;
 	}
 
 	public class Server {
@@ -34,6 +29,8 @@ public class EventHandler implements IEventHandler {
 
 		public  HashMap<String, Event> pendingEvents;
 
+		// It is presumed that the event is a valid event to be appended to the graph, i.e., the parents of the event
+        // are already incorporated into the graph.
 		public void AddEventToGraph(Event newEvent) {
 			events.put(newEvent.eventId, newEvent);
 			int depth = newEvent.depth;
@@ -49,6 +46,27 @@ public class EventHandler implements IEventHandler {
 			}
 			maxDepth = Math.max(depth, maxDepth);
 		}
+
+        public EventGraph(String roomId) {
+            events = new HashMap<>();
+            eventIdsByDepth = new HashMap<>();
+            maxDepth = 0;
+            unknownEventIds = new HashSet<>();
+            pendingEvents = new HashMap<>();
+
+            // Add the root event to the event graph.
+            Event root_event = new Event();
+            root_event.eventId = roomId + "root_event";
+            root_event.depth = 0;
+            root_event.senderId = "root";
+            root_event.parentEventIds = new HashSet<>();
+            root_event.timestamp = new Timestamp(0); // unix epoch
+            root_event.content = "root event placeholder";
+
+            events.put(root_event.eventId, root_event);
+            eventIdsByDepth.put(0, new HashSet<>());
+            eventIdsByDepth.get(0).add(root_event.eventId);
+        }
 	}
 
 	public class Event {
@@ -68,10 +86,11 @@ public class EventHandler implements IEventHandler {
 			content = message.getMessageContent();
 			senderId = message.getOwnerId();
 		}
+
+        public Event() {}
 	}
 
-	public HashMap<String, Room> rooms;
-
+    // Implements the interface
 	@Override
 	public List<MessageContext> analyzeMessage(List<MessageContext> messageContext) {
 		// ReceiveMessages
@@ -96,6 +115,34 @@ public class EventHandler implements IEventHandler {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    public List<MessageContext> ConvertAllRoomsToMessageContexts() {
+        LinkedList<MessageContext> messageContexts = new LinkedList<>();
+        for (String roomId : rooms.keySet()) {
+            Room room = rooms.get(roomId);
+            for (Event event: room.eventGraph.events.values()) {
+                messageContexts.add(new MessageContext(roomId, new ArrayList<>(room.userIds), event.senderId, new ArrayList<>(event.parentEventIds),
+                        event.eventId, event.timestamp, event.depth, event.content));
+            }
+        }
+        return messageContexts;
+    }
+
+    public HashMap<String, Room> rooms;
+
+    // Assume the messages argument is not null.
+    public EventHandler(List<MessageContext> messages) {
+        rooms = new HashMap<>();
+        HashMap<String, List<MessageContext>> messagesByRoomId = SortMessagesByRoomId(messages);
+        for (String roomId: messagesByRoomId.keySet()) {
+            List<MessageContext> msgs = messagesByRoomId.get(roomId);
+            Room room = new Room();
+            room.roomId = roomId;
+            room.eventGraph = new EventGraph(roomId);
+            room.userIds = msgs.size() != 0 ? new ArrayList<>(msgs.get(0).getUserIds()) : new ArrayList<>();
+            AddMessagesToEventGraph(room.eventGraph, messages);
+        }
+    }
 
 	private void AddMessagesToEventGraph(EventGraph eventGraph, List<MessageContext> messages) {
 		HashMap<String, Event> newEvents = MessagesToEvents(messages);
@@ -133,4 +180,16 @@ public class EventHandler implements IEventHandler {
 		return events;
 	}
 
+    public static HashMap<String, List<MessageContext>> SortMessagesByRoomId(List<MessageContext> messages) {
+        HashMap<String, List<MessageContext>> messagesByRoomId = new HashMap<>();
+        for (MessageContext msg: messages) {
+            String roomId = msg.getRoomId();
+            if (messagesByRoomId.containsKey(roomId)) {
+                messagesByRoomId.get(roomId).add(msg);
+            } else {
+                messagesByRoomId.put(roomId, new LinkedList<>(Collections.singleton(msg)));
+            }
+        }
+        return messagesByRoomId;
+    }
 }
