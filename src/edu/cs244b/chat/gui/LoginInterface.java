@@ -33,7 +33,8 @@ public class LoginInterface {
         //Login event
         class ClickListener implements ActionListener {
             public void actionPerformed(ActionEvent e) {
-               System.out.println("Clicked!");
+                // Todo: call api, login method, POST user id and room id
+                System.out.println("Clicked!");
             }
          }
 

@@ -29,7 +29,7 @@ public class ChatRoom extends JFrame{
                 String content = inputField.getText();
                 
                 if (content != null) {
-                    //send message API
+                    // Todo: send message API
                     chatContent.append(content+"\n");
                 }else {
                     chatContent.append("Can't send empty content");
