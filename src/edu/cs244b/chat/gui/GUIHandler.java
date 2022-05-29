@@ -31,4 +31,9 @@ public class GUIHandler implements IGUIHandler {
 
 	}
 
+	public void logIn(String userName, String roomNumber) {
+
+
+	}
+
 }
