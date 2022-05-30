@@ -31,9 +31,16 @@ public class GUIHandler implements IGUIHandler {
 
 	}
 
+	@Override
 	public void logIn(String userName, String roomNumber) {
 		
 
+	}
+
+	@Override
+	public List<MessageContext> getRoomMessage(String roomId, String messageId) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

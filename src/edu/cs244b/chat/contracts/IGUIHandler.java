@@ -30,5 +30,11 @@ public interface IGUIHandler {
 	 * 
 	 * @param destination IP address, user name or room name
 	 */
-	void addConnection(String destination);
+	void addConnection(String destination); 
+
+
+	void logIn(String userName, String roomNumber);  // same as the addConnection
+
+
+	List<MessageContext> getRoomMessage(String roomId, String messageId); // !!!!!!!!!!!!! i need this
 }
