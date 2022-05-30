@@ -36,5 +36,5 @@ public interface IGUIHandler {
 	void logIn(String userName, String roomNumber);  // same as the addConnection
 
 
-	List<MessageContext> getRoomMessage(String roomId, String messageId); // !!!!!!!!!!!!! i need this
+	List<MessageContext> getRoomMessage(String roomId, String messageId); 
 }
