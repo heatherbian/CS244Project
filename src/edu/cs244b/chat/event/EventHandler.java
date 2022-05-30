@@ -5,6 +5,7 @@ import java.util.*;
 
 import edu.cs244b.chat.contracts.IEventHandler;
 import edu.cs244b.chat.contracts.MessageContext;
+import jdk.internal.org.objectweb.asm.Handle;
 
 public class EventHandler implements IEventHandler {
     // Data structure definitions
@@ -113,7 +114,11 @@ public class EventHandler implements IEventHandler {
 	@Override
 	public List<MessageContext> syncMessage(List<MessageContext> messageContext) {
 		// TODO Auto-generated method stub
-		return null;
+		List<MessageContext> messagesToSend = new ArrayList<>();
+		for (MessageContext msg : messageContext) {
+			messagesToSend.addAll(HandleNewMessage(msg));
+		}
+		return messagesToSend;
 	}
 
     public List<MessageContext> ConvertAllRoomsToMessageContexts() {
@@ -127,6 +132,23 @@ public class EventHandler implements IEventHandler {
         }
         return messageContexts;
     }
+
+	// The new_message argument is supposed to have the timestamp, owner_id, message content and the room id. Maybe
+	// message ID? (generated in event handler vs gui)
+	public List<MessageContext> HandleNewMessage(MessageContext new_message) {
+		Room room = rooms.get(new_message.getRoomId());
+		Event event = new Event();
+		event.timestamp = new_message.getTimestamp();
+		event.senderId = new_message.getOwnerId();
+		event.content = new_message.getMessageContent();
+		event.depth = room.eventGraph.maxDepth + 1;
+		event.parentEventIds = room.eventGraph.eventIdsByDepth.get(room.eventGraph.maxDepth);
+		event.eventId = GenerateEventId(event.timestamp, event.senderId, event.content, event.depth);
+		room.eventGraph.AddEventToGraph(event);
+		MessageContext message_to_send = new MessageContext(room.roomId, room.userIds, event.senderId, new ArrayList<>(event.parentEventIds),
+				event.eventId, event.timestamp, event.depth, event.content);
+		return Arrays.asList(new_message);
+	}
 
     public HashMap<String, Room> rooms;
 
@@ -192,4 +214,8 @@ public class EventHandler implements IEventHandler {
         }
         return messagesByRoomId;
     }
+
+	public static String GenerateEventId(Timestamp timestamp, String userId, String content, int depth) {
+		return timestamp.toString()+userId;
+	}
 }
