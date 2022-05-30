@@ -38,7 +38,6 @@ public class LoginInterface {
         // image login button
         JPanel loginPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         loginPanel.setBackground(new Color(204, 255, 229));
-
         String IMG_PATH = "/Users/Joanne/Downloads/CS244Project/src/edu/cs244b/chat/gui/login.jpg";        
         BufferedImage inputImage = ImageIO.read(new File(IMG_PATH));
         BufferedImage newImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
