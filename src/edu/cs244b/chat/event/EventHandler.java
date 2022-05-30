@@ -9,7 +9,8 @@ import edu.cs244b.chat.contracts.MessageRequest;
 import jdk.internal.org.objectweb.asm.Handle;
 
 public class EventHandler implements IEventHandler {
-    // Data structure definitions
+	// -----------------------------------------------------------------------------------------------------------------
+	// Start DataStructures Only for internal use of this the EventHandler.
 	public class Room {
 		public String roomId;
 		public ArrayList<String> userIds;
@@ -91,8 +92,11 @@ public class EventHandler implements IEventHandler {
 
         public Event() {}
 	}
+	// End DataStructures Only for internal use of this the EventHandler.
+	// -----------------------------------------------------------------------------------------------------------------
 
-    // Implements the interface
+    // Implements the interface. This object is instantiated when the program starts. The messageContext passed in to
+	// the constructor are the messages stored on disk.
 	@Override
 	public MessageRequest analyzeMessage(List<MessageContext> messageContext) {
 		// ReceiveMessages
@@ -216,6 +220,9 @@ public class EventHandler implements IEventHandler {
 		return events;
 	}
 
+	private boolean needMessageSyc;
+
+	// Static helper functions below.
     public static HashMap<String, List<MessageContext>> SortMessagesByRoomId(List<MessageContext> messages) {
         HashMap<String, List<MessageContext>> messagesByRoomId = new HashMap<>();
         for (MessageContext msg: messages) {
