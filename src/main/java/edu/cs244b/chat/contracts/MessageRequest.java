@@ -1,6 +1,7 @@
 package edu.cs244b.chat.contracts;
 
-import javafx.util.Pair;
+import org.apache.commons.math3.util.Pair;
+
 import java.util.List;
 
 public class MessageRequest {

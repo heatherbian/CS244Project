@@ -12,6 +12,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
+import java.sql.Timestamp;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -121,7 +122,8 @@ public class ChatManager {
 				} else {
 					List<String> parentMessageId = null;
 					long messageId = System.currentTimeMillis();
-					MessageContext messageContext = new MessageContext(roomId, users, userId, parentMessageId, messageId, message);
+					Timestamp timestamp = new Timestamp(messageId);
+					MessageContext messageContext = new MessageContext(roomId, users, userId, parentMessageId, String.valueOf(messageId), timestamp, 0, message);
 					Gson gson = new Gson();
 					serverRegister.sendMessage(gson.toJson(messageContext));
 					storageHandler.updateMessage(roomId, messageContext);

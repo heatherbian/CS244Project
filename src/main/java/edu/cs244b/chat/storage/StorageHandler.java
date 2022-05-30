@@ -39,7 +39,7 @@ public class StorageHandler implements IStorageHandler {
 		List<MessageContext> list = messages.get(roomId);
 		if (list == null || list.isEmpty())
 		return null;
-		return list.stream().filter(e -> e.getMessageId()==messageId).findAny().orElse(null);
+		return list.stream().filter(e -> e.getMessageId().equals(messageId)).findAny().orElse(null);
 	}
 
 	@Override
@@ -74,7 +74,7 @@ public class StorageHandler implements IStorageHandler {
 		List<MessageContext> res = new LinkedList<>();
 		int i = 0;
 		for(; i < list.size(); i++)
-			if(list.get(i).getMessageId()==messageId)
+			if(list.get(i).getMessageId().equals(messageId))
 				break;
 		res.addAll(list.subList(i+ 1, list.size()));
 		return res;

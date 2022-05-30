@@ -1,6 +1,5 @@
 package edu.cs244b.chat.contracts;
 
-import sun.plugin2.message.Message;
 
 import java.util.List;
 
