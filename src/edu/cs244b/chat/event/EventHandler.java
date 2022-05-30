@@ -5,6 +5,7 @@ import java.util.*;
 
 import edu.cs244b.chat.contracts.IEventHandler;
 import edu.cs244b.chat.contracts.MessageContext;
+import edu.cs244b.chat.contracts.MessageRequest;
 import jdk.internal.org.objectweb.asm.Handle;
 
 public class EventHandler implements IEventHandler {
@@ -93,7 +94,7 @@ public class EventHandler implements IEventHandler {
 
     // Implements the interface
 	@Override
-	public List<MessageContext> analyzeMessage(List<MessageContext> messageContext) {
+	public MessageRequest analyzeMessage(List<MessageContext> messageContext) {
 		// ReceiveMessages
 		HashMap<String, List<MessageContext>> messagesByRoomId = new HashMap<>();
 		for (MessageContext message : messageContext) {
@@ -112,16 +113,29 @@ public class EventHandler implements IEventHandler {
 	}
 
 	@Override
-	public List<MessageContext> syncMessage(List<MessageContext> messageContext) {
+	public List<MessageContext> handleNewMessage(MessageContext messageContext) {
 		// TODO Auto-generated method stub
 		List<MessageContext> messagesToSend = new ArrayList<>();
-		for (MessageContext msg : messageContext) {
-			messagesToSend.addAll(HandleNewMessage(msg));
-		}
+		messagesToSend.addAll(HandleNewMessage(messageContext));
 		return messagesToSend;
 	}
 
-    public List<MessageContext> ConvertAllRoomsToMessageContexts() {
+	@Override
+	public List<MessageContext> handleMessageRequest(MessageRequest messageRequest) {
+		return null;
+	}
+
+	@Override
+	public List<MessageContext> getAllMessages() {
+		return null;
+	}
+
+	@Override
+	public List<MessageContext> getAllMessagesFromRoom(String roomId) {
+		return null;
+	}
+
+	public List<MessageContext> ConvertAllRoomsToMessageContexts() {
         LinkedList<MessageContext> messageContexts = new LinkedList<>();
         for (String roomId : rooms.keySet()) {
             Room room = rooms.get(roomId);
