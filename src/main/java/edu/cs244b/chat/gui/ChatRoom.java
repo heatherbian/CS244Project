@@ -36,7 +36,7 @@ public class ChatRoom extends JFrame{
         //sendButton = new JButton("send");
 
 
-        String IMG_PATH = "/Users/Joanne/Downloads/CS244Project/src/edu/cs244b/chat/gui/send.jpg";        
+        String IMG_PATH = "src/main/resources/send.jpg";
         BufferedImage inputImage = ImageIO.read(new File(IMG_PATH));
         BufferedImage newImage = new BufferedImage(30, 30, BufferedImage.TYPE_INT_ARGB);
         Graphics g = newImage.getGraphics();  // get its graphics object

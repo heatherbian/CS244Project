@@ -39,7 +39,7 @@ public class UserList extends JFrame {
  
         // Joint room Panel
         JPanel buttonPanel = new JPanel();
-        String IMG_PATH = "/Users/Joanne/Downloads/CS244Project/src/edu/cs244b/chat/gui/jointheroom.jpg";        
+        String IMG_PATH = "src/main/resources/jointheroom.jpg";
         BufferedImage inputImage = ImageIO.read(new File(IMG_PATH));
         BufferedImage newImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
         Graphics g = newImage.getGraphics(); 
