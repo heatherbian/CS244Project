@@ -9,94 +9,22 @@ import edu.cs244b.chat.contracts.MessageRequest;
 import jdk.internal.org.objectweb.asm.Handle;
 
 public class EventHandler implements IEventHandler {
-	// -----------------------------------------------------------------------------------------------------------------
-	// Start DataStructures Only for internal use of this the EventHandler.
-	public class Room {
-		public String roomId;
-		public ArrayList<String> userIds;
-		public ArrayList<Server> servers;
-		public EventGraph eventGraph;
-	}
-
-	public class Server {
-		public String ipAddress;
-		public int port;
-	}
-
-	public class EventGraph {
-		public HashMap<String, Event> events; // event_id to event.
-		public HashMap<Integer, HashSet<String>> eventIdsByDepth;
-		public int maxDepth; // depth of the latest events in the event graph.
-
-		public HashSet<String> unknownEventIds;
-
-		public  HashMap<String, Event> pendingEvents;
-
-		// It is presumed that the event is a valid event to be appended to the graph, i.e., the parents of the event
-        // are already incorporated into the graph.
-		public void AddEventToGraph(Event newEvent) {
-			events.put(newEvent.eventId, newEvent);
-			int depth = newEvent.depth;
-			if(!eventIdsByDepth.containsKey(depth)) {
-				eventIdsByDepth.put(depth, new HashSet<>());
-			}
-			eventIdsByDepth.get(depth).add(newEvent.eventId);
-			newEvent.parentEventIds = eventIdsByDepth.get(depth - 1);
-			if (depth < maxDepth) {
-				for(String nextLevelEventId : eventIdsByDepth.get(depth + 1)) {
-					events.get(nextLevelEventId).parentEventIds.add(newEvent.eventId);
-				}
-			}
-			maxDepth = Math.max(depth, maxDepth);
+	// Implements the IEventHandler interface. This object is instantiated when the program starts. The messageContext
+	// passed in to the constructor are the messages stored on disk.
+	public EventHandler(List<MessageContext> messages) {
+		rooms = new HashMap<>();
+		HashMap<String, List<MessageContext>> messagesByRoomId = SortMessagesByRoomId(messages);
+		for (String roomId: messagesByRoomId.keySet()) {
+			List<MessageContext> msgs = messagesByRoomId.get(roomId);
+			Room room = new Room();
+			room.roomId = roomId;
+			room.eventGraph = new EventGraph(roomId);
+			room.userIds = msgs.size() != 0 ? new ArrayList<>(msgs.get(0).getUserIds()) : new ArrayList<>();
+			AddMessagesToEventGraph(room.eventGraph, messages);
 		}
-
-        public EventGraph(String roomId) {
-            events = new HashMap<>();
-            eventIdsByDepth = new HashMap<>();
-            maxDepth = 0;
-            unknownEventIds = new HashSet<>();
-            pendingEvents = new HashMap<>();
-
-            // Add the root event to the event graph.
-            Event root_event = new Event();
-            root_event.eventId = roomId + "root_event";
-            root_event.depth = 0;
-            root_event.senderId = "root";
-            root_event.parentEventIds = new HashSet<>();
-            root_event.timestamp = new Timestamp(0); // unix epoch
-            root_event.content = "root event placeholder";
-
-            events.put(root_event.eventId, root_event);
-            eventIdsByDepth.put(0, new HashSet<>());
-            eventIdsByDepth.get(0).add(root_event.eventId);
-        }
 	}
 
-	public class Event {
-		// We only support sending messages currently, so an event is essentially a message.
-		String eventId;
-		int depth;
-		String senderId;
-		HashSet<String> parentEventIds;
-		Timestamp timestamp;
-		String content;
 
-		public Event(MessageContext message){
-			eventId = message.getMessageId();
-			depth = message.getDepth();
-			parentEventIds = new HashSet<>(message.getParentMessageId());
-			timestamp = message.getTimestamp();
-			content = message.getMessageContent();
-			senderId = message.getOwnerId();
-		}
-
-        public Event() {}
-	}
-	// End DataStructures Only for internal use of this the EventHandler.
-	// -----------------------------------------------------------------------------------------------------------------
-
-    // Implements the interface. This object is instantiated when the program starts. The messageContext passed in to
-	// the constructor are the messages stored on disk.
 	@Override
 	public MessageRequest analyzeMessage(List<MessageContext> messageContext) {
 		// ReceiveMessages
@@ -120,7 +48,7 @@ public class EventHandler implements IEventHandler {
 	public List<MessageContext> handleNewMessage(MessageContext messageContext) {
 		// TODO Auto-generated method stub
 		List<MessageContext> messagesToSend = new ArrayList<>();
-		messagesToSend.addAll(HandleNewMessage(messageContext));
+		messagesToSend.addAll(HandleNewMessageInternal(messageContext));
 		return messagesToSend;
 	}
 
@@ -151,9 +79,9 @@ public class EventHandler implements IEventHandler {
         return messageContexts;
     }
 
-	// The new_message argument is supposed to have the timestamp, owner_id, message content and the room id. Maybe
-	// message ID? (generated in event handler vs gui)
-	public List<MessageContext> HandleNewMessage(MessageContext new_message) {
+
+	// The new_message argument is supposed to have the timestamp, owner_id, message content and the room id.
+	public List<MessageContext> HandleNewMessageInternal(MessageContext new_message) {
 		Room room = rooms.get(new_message.getRoomId());
 		Event event = new Event();
 		event.timestamp = new_message.getTimestamp();
@@ -169,20 +97,6 @@ public class EventHandler implements IEventHandler {
 	}
 
     public HashMap<String, Room> rooms;
-
-    // Assume the messages argument is not null.
-    public EventHandler(List<MessageContext> messages) {
-        rooms = new HashMap<>();
-        HashMap<String, List<MessageContext>> messagesByRoomId = SortMessagesByRoomId(messages);
-        for (String roomId: messagesByRoomId.keySet()) {
-            List<MessageContext> msgs = messagesByRoomId.get(roomId);
-            Room room = new Room();
-            room.roomId = roomId;
-            room.eventGraph = new EventGraph(roomId);
-            room.userIds = msgs.size() != 0 ? new ArrayList<>(msgs.get(0).getUserIds()) : new ArrayList<>();
-            AddMessagesToEventGraph(room.eventGraph, messages);
-        }
-    }
 
 	private void AddMessagesToEventGraph(EventGraph eventGraph, List<MessageContext> messages) {
 		HashMap<String, Event> newEvents = MessagesToEvents(messages);
@@ -221,6 +135,92 @@ public class EventHandler implements IEventHandler {
 	}
 
 	private boolean needMessageSyc;
+
+	// -----------------------------------------------------------------------------------------------------------------
+	// Start DataStructures Only for internal use of this the EventHandler.
+	public class Room {
+		public String roomId;
+		public ArrayList<String> userIds;
+		public ArrayList<Server> servers;
+		public EventGraph eventGraph;
+	}
+
+	public class Server {
+		public String ipAddress;
+		public int port;
+	}
+
+	public class EventGraph {
+		public HashMap<String, Event> events; // event_id to event.
+		public HashMap<Integer, HashSet<String>> eventIdsByDepth;
+		public int maxDepth; // depth of the latest events in the event graph.
+
+		public HashSet<String> unknownEventIds;
+
+		public  HashMap<String, Event> pendingEvents;
+
+		// It is presumed that the event is a valid event to be appended to the graph, i.e., the parents of the event
+		// are already incorporated into the graph.
+		public void AddEventToGraph(Event newEvent) {
+			events.put(newEvent.eventId, newEvent);
+			int depth = newEvent.depth;
+			if(!eventIdsByDepth.containsKey(depth)) {
+				eventIdsByDepth.put(depth, new HashSet<>());
+			}
+			eventIdsByDepth.get(depth).add(newEvent.eventId);
+			newEvent.parentEventIds = eventIdsByDepth.get(depth - 1);
+			if (depth < maxDepth) {
+				for(String nextLevelEventId : eventIdsByDepth.get(depth + 1)) {
+					events.get(nextLevelEventId).parentEventIds.add(newEvent.eventId);
+				}
+			}
+			maxDepth = Math.max(depth, maxDepth);
+		}
+
+		public EventGraph(String roomId) {
+			events = new HashMap<>();
+			eventIdsByDepth = new HashMap<>();
+			maxDepth = 0;
+			unknownEventIds = new HashSet<>();
+			pendingEvents = new HashMap<>();
+
+			// Add the root event to the event graph.
+			Event root_event = new Event();
+			root_event.eventId = roomId + "root_event";
+			root_event.depth = 0;
+			root_event.senderId = "root";
+			root_event.parentEventIds = new HashSet<>();
+			root_event.timestamp = new Timestamp(0); // unix epoch
+			root_event.content = "root event placeholder";
+
+			events.put(root_event.eventId, root_event);
+			eventIdsByDepth.put(0, new HashSet<>());
+			eventIdsByDepth.get(0).add(root_event.eventId);
+		}
+	}
+
+	public class Event {
+		// We only support sending messages currently, so an event is essentially a message.
+		String eventId;
+		int depth;
+		String senderId;
+		HashSet<String> parentEventIds;
+		Timestamp timestamp;
+		String content;
+
+		public Event(MessageContext message){
+			eventId = message.getMessageId();
+			depth = message.getDepth();
+			parentEventIds = new HashSet<>(message.getParentMessageId());
+			timestamp = message.getTimestamp();
+			content = message.getMessageContent();
+			senderId = message.getOwnerId();
+		}
+
+		public Event() {}
+	}
+	// End DataStructures Only for internal use of this the EventHandler.
+	// -----------------------------------------------------------------------------------------------------------------
 
 	// Static helper functions below.
     public static HashMap<String, List<MessageContext>> SortMessagesByRoomId(List<MessageContext> messages) {
