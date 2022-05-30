@@ -1,13 +1,18 @@
 package edu.cs244b.chat.contracts;
 
-public class MessageRequest {
-    public boolean needMessagesFromOtherServers;  // Whether we need to request message history from other servers.
-    public int startDepth;  // The lower bound depth of message we need.
-    public int endDepth; // The upper bound depth of the messages we need. If set to -1, it means that there is no upper bound.
+import javafx.util.Pair;
+import java.util.List;
 
-    public MessageRequest(boolean needMessagesFromOtherServers, int startDepth, int endDepth) {
+public class MessageRequest {
+    // Whether we need to request message history from other servers. If this boolean is set to false, there is no need
+    // to send requests to other servers.
+    public boolean needMessagesFromOtherServers;
+
+    // A list of requests for each room
+    public List<Pair<String, Pair<Integer, Integer>>> requests;
+
+    public MessageRequest(boolean needMessagesFromOtherServers, List<Pair<String, Pair<Integer, Integer>>> requests) {
         this.needMessagesFromOtherServers = needMessagesFromOtherServers;
-        this.startDepth = startDepth;
-        this.endDepth = endDepth;
+        this.requests = requests;
     }
 }

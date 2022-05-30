@@ -6,7 +6,6 @@ import java.util.*;
 import edu.cs244b.chat.contracts.IEventHandler;
 import edu.cs244b.chat.contracts.MessageContext;
 import edu.cs244b.chat.contracts.MessageRequest;
-import jdk.internal.org.objectweb.asm.Handle;
 
 public class EventHandler implements IEventHandler {
 	// Implements the IEventHandler interface. This object is instantiated when the program starts. The messageContext
@@ -22,6 +21,7 @@ public class EventHandler implements IEventHandler {
 			room.userIds = msgs.size() != 0 ? new ArrayList<>(msgs.get(0).getUserIds()) : new ArrayList<>();
 			AddMessagesToEventGraph(room.eventGraph, messages);
 		}
+		needMessageSyc = true;
 	}
 
 
@@ -41,7 +41,14 @@ public class EventHandler implements IEventHandler {
 			if (!rooms.containsKey(roomId)) { continue; }
 			AddMessagesToEventGraph(rooms.get(roomId).eventGraph, messagesByRoomId.get(roomId));
 		}
-		return null;
+
+		// Generate message request
+		if(needMessageSyc) {
+			// The instance has just started.
+			needMessageSyc = false;
+			return new MessageRequest(true, null);
+		}
+		return new MessageRequest(false, null);
 	}
 
 	@Override
@@ -59,12 +66,26 @@ public class EventHandler implements IEventHandler {
 
 	@Override
 	public List<MessageContext> getAllMessages() {
-		return null;
+		LinkedList<MessageContext> messageContexts = new LinkedList<>();
+		for (String roomId : rooms.keySet()) {
+			Room room = rooms.get(roomId);
+			for (Event event: room.eventGraph.events.values()) {
+				messageContexts.add(new MessageContext(roomId, new ArrayList<>(room.userIds), event.senderId, new ArrayList<>(event.parentEventIds),
+						event.eventId, event.timestamp, event.depth, event.content));
+			}
+		}
+		return messageContexts;
 	}
 
 	@Override
 	public List<MessageContext> getAllMessagesFromRoom(String roomId) {
-		return null;
+		LinkedList<MessageContext> messageContexts = new LinkedList<>();
+		Room room = rooms.get(roomId);
+		for (Event event: room.eventGraph.events.values()) {
+			messageContexts.add(new MessageContext(roomId, new ArrayList<>(room.userIds), event.senderId, new ArrayList<>(event.parentEventIds),
+					event.eventId, event.timestamp, event.depth, event.content));
+		}
+		return messageContexts;
 	}
 
 	public List<MessageContext> ConvertAllRoomsToMessageContexts() {
