@@ -14,7 +14,7 @@ public interface IEventHandler {
 	 * @param messageContext 
 	 * @return a message request that indicates if further messages is required from other servers.
 	 */
-	MessageRequest analyzeMessage(List<MessageContext> messageContext);
+	MessageRequest analyzeMessage(List<MessageContext> messageContext, String userId);
 	
 	/**
 	 * Store the new message to the event graph and generate the List of messageContext for broadcasting to other

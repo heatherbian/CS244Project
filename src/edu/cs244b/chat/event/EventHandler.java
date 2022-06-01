@@ -6,6 +6,7 @@ import java.util.*;
 import edu.cs244b.chat.contracts.IEventHandler;
 import edu.cs244b.chat.contracts.MessageContext;
 import edu.cs244b.chat.contracts.MessageRequest;
+import javafx.util.Pair;
 
 public class EventHandler implements IEventHandler {
 	// Implements the IEventHandler interface. This object is instantiated when the program starts. The messageContext
@@ -21,7 +22,12 @@ public class EventHandler implements IEventHandler {
 			room.userIds = msgs.size() != 0 ? new ArrayList<>(msgs.get(0).getUserIds()) : new ArrayList<>();
 			AddMessagesToEventGraph(room.eventGraph, messages);
 		}
-		needMessageSyc = true;
+		needMessageSync = true;
+	}
+
+	// Pass in a map of RoomId to List<String> UserIds.
+	public EventHandler(Map<String, List<String>> roomIdToUserList) {
+
 	}
 
 
@@ -43,12 +49,18 @@ public class EventHandler implements IEventHandler {
 		}
 
 		// Generate message request
-		if(needMessageSyc) {
+		if(needMessageSync) {
 			// The instance has just started.
-			needMessageSyc = false;
-			return new MessageRequest(true, null);
+			needMessageSync = false;
+			List<Pair<String, Pair<Integer, Integer>>> requests = new ArrayList<>();
+			for (String roomId : rooms.keySet()) {
+				requests.add(new Pair<>(roomId, new Pair<>(0, -1)));
+			}
+			// If requests is empty, it means we have no info about the room, then we need to get all messages that the
+			// other servers have.
+			return new MessageRequest(true, requests.isEmpty(), requests);
 		}
-		return new MessageRequest(false, null);
+		return new MessageRequest(false, false, null);
 	}
 
 	@Override
@@ -155,7 +167,7 @@ public class EventHandler implements IEventHandler {
 		return events;
 	}
 
-	private boolean needMessageSyc;
+	private boolean needMessageSync;
 
 	// -----------------------------------------------------------------------------------------------------------------
 	// Start DataStructures Only for internal use of this the EventHandler.

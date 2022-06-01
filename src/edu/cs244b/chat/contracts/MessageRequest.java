@@ -8,10 +8,14 @@ public class MessageRequest {
     // to send requests to other servers.
     public boolean needMessagesFromOtherServers;
 
+    // Whether return everything that the server has to the other server.
+    public boolean syncEverything;
+
     // A list of requests for each room
     public List<Pair<String, Pair<Integer, Integer>>> requests;
 
-    public MessageRequest(boolean needMessagesFromOtherServers, List<Pair<String, Pair<Integer, Integer>>> requests) {
+    public MessageRequest(boolean needMessagesFromOtherServers, boolean syncEverything, List<Pair<String, Pair<Integer, Integer>>> requests) {
+        this.syncEverything = syncEverything;
         this.needMessagesFromOtherServers = needMessagesFromOtherServers;
         this.requests = requests;
     }
