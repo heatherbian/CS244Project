@@ -8,25 +8,37 @@ import edu.cs244b.chat.contracts.MessageContext;
 import edu.cs244b.chat.contracts.MessageRequest;
 
 public class EventHandler implements IEventHandler {
-	// Implements the IEventHandler interface. This object is instantiated when the program starts. The messageContext
-	// passed in to the constructor are the messages stored on disk.
-	public EventHandler(List<MessageContext> messages) {
+	// 	Deprecated constructor.
+	//	public EventHandler(List<MessageContext> messages) {
+	//		rooms = new HashMap<>();
+	//		HashMap<String, List<MessageContext>> messagesByRoomId = SortMessagesByRoomId(messages);
+	//		for (String roomId: messagesByRoomId.keySet()) {
+	//			List<MessageContext> msgs = messagesByRoomId.get(roomId);
+	//			Room room = new Room();
+	//			room.roomId = roomId;
+	//			room.eventGraph = new EventGraph(roomId);
+	//			room.userIds = msgs.size() != 0 ? new ArrayList<>(msgs.get(0).getUserIds()) : new ArrayList<>();
+	//			AddMessagesToEventGraph(room.eventGraph, messages);
+	//		}
+	//		needMessageSyc = true;
+	//	}
+
+	// Implements the IEventHandler interface. This object is instantiated when the program starts. The roomIdToUserIdList
+	// provides the list of roomIds mapped to the rooms' userIds.
+	public EventHandler(Map<String, List<String>> roomIdToUserIdList) {
 		rooms = new HashMap<>();
-		HashMap<String, List<MessageContext>> messagesByRoomId = SortMessagesByRoomId(messages);
-		for (String roomId: messagesByRoomId.keySet()) {
-			List<MessageContext> msgs = messagesByRoomId.get(roomId);
+		for (String roomId: roomIdToUserIdList.keySet()) {
 			Room room = new Room();
 			room.roomId = roomId;
 			room.eventGraph = new EventGraph(roomId);
-			room.userIds = msgs.size() != 0 ? new ArrayList<>(msgs.get(0).getUserIds()) : new ArrayList<>();
-			AddMessagesToEventGraph(room.eventGraph, messages);
+			room.userIds = new ArrayList<>(roomIdToUserIdList.get(roomId));
 		}
 		needMessageSyc = true;
 	}
 
 
 	@Override
-	public MessageRequest analyzeMessage(List<MessageContext> messageContext) {
+	public MessageRequest analyzeMessage(List<MessageContext> messageContext, String userId) {
 		// ReceiveMessages
 		HashMap<String, List<MessageContext>> messagesByRoomId = new HashMap<>();
 		for (MessageContext message : messageContext) {
@@ -38,7 +50,10 @@ public class EventHandler implements IEventHandler {
 			messages.add(message);
 		}
 		for (String roomId : messagesByRoomId.keySet()) {
-			if (!rooms.containsKey(roomId)) { continue; }
+			if (!rooms.containsKey(roomId)) {
+				System.out.println("Warning!!! Unknown roomId in the input analyzeMessage");
+				continue;
+			}
 			AddMessagesToEventGraph(rooms.get(roomId).eventGraph, messagesByRoomId.get(roomId));
 		}
 
@@ -46,9 +61,9 @@ public class EventHandler implements IEventHandler {
 		if(needMessageSyc) {
 			// The instance has just started.
 			needMessageSyc = false;
-			return new MessageRequest(true, null);
+			return new MessageRequest(true, true,null);
 		}
-		return new MessageRequest(false, null);
+		return new MessageRequest(false, false,null);
 	}
 
 	@Override
@@ -61,7 +76,7 @@ public class EventHandler implements IEventHandler {
 
 	@Override
 	public List<MessageContext> handleMessageRequest(MessageRequest messageRequest) {
-		return null;
+		return getAllMessages();
 	}
 
 	@Override
@@ -162,13 +177,7 @@ public class EventHandler implements IEventHandler {
 	public class Room {
 		public String roomId;
 		public ArrayList<String> userIds;
-		public ArrayList<Server> servers;
 		public EventGraph eventGraph;
-	}
-
-	public class Server {
-		public String ipAddress;
-		public int port;
 	}
 
 	public class EventGraph {

@@ -10,10 +10,11 @@ public interface IEventHandler {
 	 * It is called when we receive messages from other servers or when the server just started (pass in messages from
 	 * storage).
 	 *
-	 * @param messageContext 
+	 * @param messageContext, userId: presenting which server the messages comes from. If it's from local disk, specify
+	 *                           string "storage"
 	 * @return a message request that indicates if further messages is required from other servers.
 	 */
-	MessageRequest analyzeMessage(List<MessageContext> messageContext);
+	MessageRequest analyzeMessage(List<MessageContext> messageContext, String userId);
 	
 	/**
 	 * Store the new message to the event graph and generate the List of messageContext for broadcasting to other
