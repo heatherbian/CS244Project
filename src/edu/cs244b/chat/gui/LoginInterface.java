@@ -23,21 +23,24 @@ public class LoginInterface {
     
         //userName Panel
         JPanel userNamePanel = new JPanel();
-        userNamePanel.setBackground(new Color(229,255, 204));
+        userNamePanel.setBackground(new Color(255,255, 255));
         JLabel userNameLabel = new JLabel("UserName");
+        userNameLabel.setForeground(new Color(16,125,174,255));
         JTextField userNameText = new JTextField(20);
         userNamePanel.add(userNameLabel);
         userNamePanel.add(userNameText);
     
         //roomID Panel
         JPanel roomIdPanel = new JPanel();
-        roomIdPanel.add(new JLabel("RoomId"));
-        roomIdPanel.setBackground(new Color(229, 255, 204));
+        JLabel roomIdLabel = new JLabel("RoomId   ");
+        roomIdLabel.setForeground(new Color(16,125,174,255));
+        roomIdPanel.add(roomIdLabel);
+        roomIdPanel.setBackground(new Color(255, 255, 255));
         roomIdPanel.add(new JTextField (20));
 
         // image login button
         JPanel loginPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
-        loginPanel.setBackground(new Color(204, 255, 229));
+        loginPanel.setBackground(new Color(255, 255, 255));
         String IMG_PATH = "/Users/Joanne/Downloads/CS244Project/src/edu/cs244b/chat/gui/login.jpg";        
         BufferedImage inputImage = ImageIO.read(new File(IMG_PATH));
         BufferedImage newImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
@@ -71,14 +74,13 @@ public class LoginInterface {
             }
         });
         
-
-        //VerticalBox
-        Box box = Box.createVerticalBox();
-        box.add(userNamePanel);
-        box.add(roomIdPanel);
-        box.add(loginPanel);
-        logIn.setContentPane(box);
-        logIn.pack();
+        userNamePanel.setSize(300, 30);
+        roomIdPanel.setSize(300, 30);
+        loginPanel.setSize(300, 100);
+        logIn.add(userNamePanel, BorderLayout.NORTH);
+        logIn.add(roomIdPanel, BorderLayout.CENTER);
+        logIn.add(loginPanel, BorderLayout.SOUTH);
+        logIn.setSize(400,230);
         logIn.setLocationRelativeTo(null);; 
         logIn.setVisible(true);
     }   

@@ -24,7 +24,7 @@ public class UserList extends JFrame {
 
         this.setLayout(new BorderLayout());
         UserList = new JTextArea();
-        UserList.setBackground(new Color(204, 229, 255));
+        UserList.setBackground(new Color(255, 255, 255));
         
         // User list panel
         Font font1 = new Font("Tahoma", Font.BOLD, 15);
@@ -32,7 +32,7 @@ public class UserList extends JFrame {
         String[] names = {"Jingyi", "Shaohui", "Henry"}; 
         for (String name : names) {           
             UserList.setFont(font1);
-            UserList.append(name + "\n");            
+            UserList.append("   " + name + "\n" + "\n");            
         }
         UserList.setEditable(false);    
         JScrollPane UserListPanel = new JScrollPane(UserList);
@@ -41,21 +41,23 @@ public class UserList extends JFrame {
         JPanel buttonPanel = new JPanel();
         String IMG_PATH = "/Users/Joanne/Downloads/CS244Project/src/edu/cs244b/chat/gui/jointheroom.jpg";        
         BufferedImage inputImage = ImageIO.read(new File(IMG_PATH));
-        BufferedImage newImage = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage newImage = new BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB);
         Graphics g = newImage.getGraphics(); 
-        g.drawImage(inputImage, 0, 0, 64, 64, null);
+        g.drawImage(inputImage, 0, 0, 50, 50, null);
         g.dispose(); 
         Icon newIcon = new ImageIcon(newImage);
         JButton imageLoginButton = new JButton(newIcon);
         buttonPanel.add(imageLoginButton);
-        buttonPanel.setBackground(new Color(204, 204, 255));
+        buttonPanel.setBackground(new Color(255, 255, 255));
 
         // Title panel
         JPanel NamePanel = new JPanel();
         JLabel NameLable = new JLabel("Room members");
+        NameLable.setForeground(new Color(16,125,174,255));
         Font font2 = new Font("Tahoma", Font.BOLD, 18);
         NameLable.setFont(font2);
         NamePanel.add(NameLable);
+        NamePanel.setBackground(new Color(255, 255, 255));
 
         // Action: join room
         imageLoginButton.addActionListener(new ActionListener() {
@@ -72,26 +74,13 @@ public class UserList extends JFrame {
             } 
         });
 
-        // VerticalBox
-        Box box = Box.createVerticalBox();
-
         NamePanel.setSize(300, 20);
         UserListPanel.setSize(300, 100);
         buttonPanel.setSize(300, 30);
 
-        // NamePanel.setPreferredSize(new Dimension(300, 20));
-        // UserListPanel.setPreferredSize(new Dimension(300, 20));
-        // buttonPanel.setPreferredSize(new Dimension(300, 20));
-
-        box.add(NamePanel);
-        box.add(UserListPanel);
-        box.add(buttonPanel);
-        box.add(Box.createVerticalGlue());
-        j.setContentPane(box);
-        j.add(NamePanel);
-        j.add(UserListPanel);
-        j.add(buttonPanel);
-        j.pack();
+        j.add(NamePanel, BorderLayout.NORTH);
+        j.add(UserListPanel, BorderLayout.CENTER);
+        j.add(buttonPanel,  BorderLayout.SOUTH);
         j.setSize(400,300);
         j.setVisible(true);
         j.setLocation(400, 200);
