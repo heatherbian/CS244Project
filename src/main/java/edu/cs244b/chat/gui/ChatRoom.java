@@ -121,7 +121,7 @@ public class ChatRoom extends JPanel {
     public void showMessage(MessageContext messageContext, boolean isSelf) {
         System.out.println("----ChatRoom-----showMessage: roomId="+messageContext.getRoomId() + ", msg="+messageContext.getMessageContent());
         if (isSelf) {
-            chatContent.append(messageContext.getMessageContent()+ " " + Utils.getDate(Long.valueOf(messageContext.getMessageId()))+"\n",true);
+            chatContent.append(messageContext.getMessageContent()+ " " + Utils.getDate(messageContext.getTimestamp())+"\n",true);
         }
         else {
             String message = "["+messageContext.getOwnerId()+"]:"+messageContext.getMessageContent();
