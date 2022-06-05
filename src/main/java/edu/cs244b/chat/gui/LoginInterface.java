@@ -26,6 +26,15 @@ public class LoginInterface extends JPanel{
         logIn = new JFrame ("Login to chatting room");
         logIn.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
 
+        // welcome anel
+        JPanel welcomePanel = new JPanel(); 
+        JLabel welcomeLabel = new JLabel("Welcome !");
+        welcomeLabel.setFont(new Font("Serif", Font.BOLD, 20));
+        welcomeLabel.setForeground(new Color(16,125,174,255));
+        welcomePanel.add(welcomeLabel);
+        welcomePanel.setBackground(new Color(229, 255, 204));
+
+
         //roomID Panel
         JPanel roomIdPanel = new JPanel();
         roomIdPanel.add(new JLabel(""));
@@ -35,7 +44,8 @@ public class LoginInterface extends JPanel{
         JPanel userNamePanel = new JPanel();
         userNamePanel.setBackground(new Color(229,255, 204));
         JLabel userNameLabel = new JLabel("UserName");
-        JTextField userNameText = new JTextField(20);
+        userNameLabel.setForeground(new Color(16,125,174,255));
+        JTextField userNameText = new JTextField(15);
         userNamePanel.add(userNameLabel);
         userNamePanel.add(userNameText);
 
@@ -55,6 +65,7 @@ public class LoginInterface extends JPanel{
         g.dispose(); 
         Icon newIcon = new ImageIcon(newImage);
         JButton imageLoginButton = new JButton(newIcon);
+        imageLoginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         loginPanel.add(imageLoginButton);
 
         imageLoginButton.addActionListener(new ActionListener() {
@@ -72,13 +83,24 @@ public class LoginInterface extends JPanel{
             }
         });
 
-        Box box = Box.createVerticalBox();
-        box.add(roomIdPanel);
-        box.add(userNamePanel);
-        box.add(loginPanel);
-        logIn.setContentPane(box);
-        logIn.pack();
-        logIn.setLocationRelativeTo(null);;
+        welcomePanel.setSize(200, 50);
+        userNamePanel.setSize(200, 50);
+        loginPanel.setSize(200, 50);
+        logIn.add(welcomePanel,  BorderLayout.NORTH);
+        logIn.add(userNamePanel, BorderLayout.CENTER);
+        logIn.add(loginPanel, BorderLayout.SOUTH);
+
+        logIn.setSize(300,200);
+        logIn.setLocationRelativeTo(null);; 
         logIn.setVisible(true);
+
+        // Box box = Box.createVerticalBox();
+        // box.add(roomIdPanel);
+        // box.add(userNamePanel);
+        // box.add(loginPanel);
+        // logIn.setContentPane(box);
+        // logIn.pack();
+        // logIn.setLocationRelativeTo(null);;
+        // logIn.setVisible(true);
     }   
 }

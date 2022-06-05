@@ -24,11 +24,13 @@ public class RoomList extends JPanel {
 
         JPanel topPanel = new JPanel();
         Label info = new Label(ChatManager.userId);
-        info.setFont(new Font("Serif", Font.BOLD, 18));
+        info.setForeground(new Color(16,125,174,255));
+        info.setFont(new Font("Serif", Font.BOLD, 20));
         topPanel.add(info);
+        topPanel.setBackground(new Color(229,255, 204));;
 
         roomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        roomList.setFont(new Font("Serif", Font.BOLD, 16));
+        roomList.setFont(new Font("Serif", Font.BOLD, 18));
         roomList.setFocusable(false);
         roomList.addListSelectionListener(new ListSelectionListener() {
             @Override
@@ -43,6 +45,9 @@ public class RoomList extends JPanel {
 
             }
         });
+        roomList.setBackground(new Color(204, 255, 229));
+        DefaultListCellRenderer renderer =  (DefaultListCellRenderer)roomList.getCellRenderer();  
+        renderer.setHorizontalAlignment(JLabel.CENTER);  
         roomList.setBounds(0,0,400, 550);
         add(topPanel, BorderLayout.NORTH);
         add(roomList, BorderLayout.CENTER);
