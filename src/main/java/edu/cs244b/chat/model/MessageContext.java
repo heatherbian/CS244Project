@@ -113,4 +113,9 @@ public class MessageContext implements Comparable<MessageContext>{
 	public int compareTo(MessageContext o){
 		return this.timestamp.compareTo(o.getTimestamp());
 	}
+
+	@Override
+	public String toString(){
+		return "MessageId: " + messageId + ", Content: " + messageContent;
+	}
 }
