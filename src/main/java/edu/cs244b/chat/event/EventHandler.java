@@ -88,6 +88,9 @@ public class EventHandler implements IEventHandler {
 		for (String roomId : rooms.keySet()) {
 			Room room = rooms.get(roomId);
 			for (Event event: room.eventGraph.events.values()) {
+				if(event.eventId.contains("root_event")){
+					continue;
+				}
 				messageContexts.add(new MessageContext(roomId, new ArrayList<>(room.userIds), event.senderId, new ArrayList<>(event.parentEventIds),
 						event.eventId, event.timestamp, event.depth, event.content));
 			}
@@ -101,6 +104,9 @@ public class EventHandler implements IEventHandler {
 		Room room = rooms.get(roomId);
 		System.out.println(room.eventGraph.events.size());
 		for (Event event: room.eventGraph.events.values()) {
+			if(event.eventId.contains("root_event")){
+				continue;
+			}
 			System.out.println(room.userIds.toString());
 			System.out.println(event.parentEventIds.toString());
 			messageContexts.add(new MessageContext(roomId, new ArrayList<>(room.userIds), event.senderId, new ArrayList<>(event.parentEventIds),
