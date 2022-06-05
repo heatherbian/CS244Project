@@ -71,6 +71,7 @@ public class EventHandler implements IEventHandler {
 	@Override
 	public List<MessageContext> handleNewMessage(MessageContext messageContext) {
 		// TODO Auto-generated method stub
+		System.out.println("Handling new message:" + messageContext.getOwnerId() + ":" + messageContext.getMessageContent());
 		List<MessageContext> messagesToSend = new ArrayList<>();
 		messagesToSend.addAll(HandleNewMessageInternal(messageContext));
 		return messagesToSend;
@@ -98,7 +99,10 @@ public class EventHandler implements IEventHandler {
 	public List<MessageContext> getAllMessagesFromRoom(String roomId) {
 		LinkedList<MessageContext> messageContexts = new LinkedList<>();
 		Room room = rooms.get(roomId);
+		System.out.println(room.eventGraph.events.size());
 		for (Event event: room.eventGraph.events.values()) {
+			System.out.println(room.userIds.toString());
+			System.out.println(event.parentEventIds.toString());
 			messageContexts.add(new MessageContext(roomId, new ArrayList<>(room.userIds), event.senderId, new ArrayList<>(event.parentEventIds),
 					event.eventId, event.timestamp, event.depth, event.content));
 		}
@@ -131,7 +135,7 @@ public class EventHandler implements IEventHandler {
 		room.eventGraph.AddEventToGraph(event);
 		MessageContext message_to_send = new MessageContext(room.roomId, room.userIds, event.senderId, new ArrayList<>(event.parentEventIds),
 				event.eventId, event.timestamp, event.depth, event.content);
-		return Arrays.asList(new_message);
+		return Arrays.asList(message_to_send);
 	}
 
     public HashMap<String, Room> rooms;
