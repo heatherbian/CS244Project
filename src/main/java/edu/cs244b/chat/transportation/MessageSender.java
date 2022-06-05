@@ -20,11 +20,6 @@ public class MessageSender extends Thread{
             System.out.println("=====MessageSender= " + this.getName() + ", ServerRegister= "+ peerRegister.getName()+"==portNum="+socket.getPort()+"=== 1");
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader((this.socket.getInputStream())));
             this.printWriter = new PrintWriter(socket.getOutputStream(), true);
-            while(true) {
-                String message = bufferedReader.readLine();
-                // TODO remove it later
-                peerRegister.sendMessage(message);
-            }
         } catch (Exception e) {
             e.printStackTrace();
             peerRegister.getServerThreadThreads().remove(this);
