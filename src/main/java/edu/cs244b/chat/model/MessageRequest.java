@@ -1,4 +1,4 @@
-package edu.cs244b.chat.contracts;
+package edu.cs244b.chat.model;
 
 import org.apache.commons.math3.util.Pair;
 

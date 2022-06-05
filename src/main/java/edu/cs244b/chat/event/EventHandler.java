@@ -4,8 +4,8 @@ import java.sql.Timestamp;
 import java.util.*;
 
 import edu.cs244b.chat.contracts.IEventHandler;
-import edu.cs244b.chat.contracts.MessageContext;
-import edu.cs244b.chat.contracts.MessageRequest;
+import edu.cs244b.chat.model.MessageContext;
+import edu.cs244b.chat.model.MessageRequest;
 
 public class EventHandler implements IEventHandler {
 	// 	Deprecated constructor.
@@ -32,6 +32,8 @@ public class EventHandler implements IEventHandler {
 			room.roomId = roomId;
 			room.eventGraph = new EventGraph(roomId);
 			room.userIds = new ArrayList<>(roomIdToUserIdList.get(roomId));
+
+			rooms.put(roomId, room);
 		}
 		needMessageSyc = true;
 	}

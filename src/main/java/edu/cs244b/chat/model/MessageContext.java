@@ -1,4 +1,4 @@
-package edu.cs244b.chat.contracts;
+package edu.cs244b.chat.model;
 
 import java.sql.Timestamp;
 import java.util.List;

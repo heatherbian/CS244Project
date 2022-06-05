@@ -1,6 +1,9 @@
 package edu.cs244b.chat.contracts;
 
 
+import edu.cs244b.chat.model.MessageContext;
+import edu.cs244b.chat.model.MessageRequest;
+
 import java.util.List;
 
 public interface IEventHandler {

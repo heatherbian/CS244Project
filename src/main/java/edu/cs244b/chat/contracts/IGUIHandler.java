@@ -1,40 +1,32 @@
 package edu.cs244b.chat.contracts;
 
-import java.util.List;
+import edu.cs244b.chat.model.MessageContext;
+import edu.cs244b.chat.model.RoomContext;
 
 public interface IGUIHandler {
 
 	/**
-	 * Respond the UI event to show message
-	 * 
-	 * @param msessageContext
-	 */
-	void showMessage(MessageContext msessageContext);
-	
-	/**
-	 * Respond the UI event to send the message
-	 * 
-	 * @param msessageContext
-	 */
-	void sendMessage(MessageContext msessageContext);
-	
-	/**
 	 * Respond the UI event to show all rooms and users
-	 * 
-	 * @return a list of String which contains room name or user name
+	 *
 	 */
-	List<String> showList();
-	
+	void showRoomList();
+
 	/**
-	 * Respond the UI event to add one room or user for chat
-	 * 
-	 * @param destination IP address, user name or room name
+	 * Display the specific room
+	 *
 	 */
-	void addConnection(String destination); 
+	void showRoom(RoomContext room);
 
+	/**
+	 * Save the message entered by UI to storage
+	 *
+	 */
+	void saveMessage(MessageContext message);
 
-	void logIn(String userName, String roomNumber);  // same as the addConnection
+	/**
+	 * Return the room's data model
+	 *
+	 */
+	RoomContext getRoom(String roomName);
 
-
-	List<MessageContext> getRoomMessage(String roomId, String messageId); 
 }

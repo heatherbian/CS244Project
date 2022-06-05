@@ -6,34 +6,32 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 public class MessageSender extends Thread{
-    private ServerRegister serverRegister;
+    private PeerRegister peerRegister;
     private Socket socket;
     private PrintWriter printWriter;
 
-    public MessageSender(Socket socket, ServerRegister serverRegister) {
+    public MessageSender(Socket socket, PeerRegister peerRegister) {
         this.socket = socket;
-        this.serverRegister = serverRegister;
+        this.peerRegister = peerRegister;
     }
 
     public void run() {
         try {
-            System.out.println("=====MessageSender= " + this.getName() + ", ServerRegister= "+ serverRegister.getName()+"===== 1");
+            System.out.println("=====MessageSender= " + this.getName() + ", ServerRegister= "+ peerRegister.getName()+"==portNum="+socket.getPort()+"=== 1");
             BufferedReader bufferedReader = new BufferedReader(new InputStreamReader((this.socket.getInputStream())));
             this.printWriter = new PrintWriter(socket.getOutputStream(), true);
             while(true) {
                 String message = bufferedReader.readLine();
                 // TODO remove it later
-                serverRegister.sendMessage(message);
+                peerRegister.sendMessage(message);
             }
         } catch (Exception e) {
-            serverRegister.getServerThreadThreads().remove(this);
+            e.printStackTrace();
+            peerRegister.getServerThreadThreads().remove(this);
         }
     }
-
 
     public PrintWriter getPrintWriter() {
         return printWriter;
     }
-
-
 }

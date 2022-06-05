@@ -1,32 +1,14 @@
-package edu.cs244b.chat.contracts;
+package edu.cs244b.chat.model;
 
 public class ConnectionContext implements Comparable<ConnectionContext>{
 
-    String roomId;
-    String roomName;
+    String userId;
     String hostName;
     int port;
 
-    public ConnectionContext(String roomName, String hostName, int port) {
-        this.roomName = roomName;
+    public ConnectionContext(String hostName, int port) {
         this.hostName = hostName;
         this.port = port;
-    }
-
-    public String getRoomName() {
-        return roomName;
-    }
-
-    public void setRoomName(String roomName) {
-        this.roomName = roomName;
-    }
-
-    public String getRoomId() {
-        return roomId;
-    }
-
-    public void setRoomId(String roomId) {
-        this.roomId = roomId;
     }
 
     public String getHostName() {
@@ -43,6 +25,14 @@ public class ConnectionContext implements Comparable<ConnectionContext>{
 
     public void setPort(int port) {
         this.port = port;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     @Override

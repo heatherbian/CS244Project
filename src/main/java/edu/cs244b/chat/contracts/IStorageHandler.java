@@ -1,57 +1,64 @@
 package edu.cs244b.chat.contracts;
 
+import edu.cs244b.chat.model.ConnectionContext;
+import edu.cs244b.chat.model.MessageContext;
+import edu.cs244b.chat.model.RoomContext;
+
 import java.util.List;
 
 public interface IStorageHandler {
 
-//	MessageContext getMessage(String messageId);
+	/**
+	 * Return all local saved messages
+	 *
+	 */
+	List<MessageContext> getAllMessages();
 
-	MessageContext getMessage(String roomId, long messageId);
-
+	/**
+	 * Return all local saved messages which belong to the specific room
+	 *
+	 */
 	List<MessageContext> getMessages(String roomId);
 
 	/**
-	 * @param msessageContext
-	 * @return the message id if create successfully, otherwise null
+	 * Return a list of all rooms
+	 *
 	 */
-	String createMessage(MessageContext msessageContext);
-
-	boolean updateMessage(MessageContext msessageContext);
-
-	boolean deleteMessage(MessageContext msessageContext);
+	List<RoomContext> getRoomList();
 
 	/**
-	 * @param roomId
-	 * @return all messages belong to the room ordered by
-	 *         {@link MessageContext#messageId}. If messageId it not empty, return
-	 *         messages after the specific message.
+	 * Return the data model of one specific room
+	 *
 	 */
-	List<MessageContext> getRoomMessage(String roomId, long messageId);
+	RoomContext getRoom(String roomId);
 
 	/**
-	 * @param roomId
-	 * @return all messages belong to the chat with the user ordered by
-	 *         {@link MessageContext#messageId}. If messageId it not empty, return
-	 *         messages after the specific message.
+	 * Save the user's all messages to local storage
+	 *
 	 */
-	List<MessageContext> getUserMessage(String userId, long messageId);
-
-	/**
-	 * @return a list of String which contains room name or user name
-	 */
-	List<String> getRoomList();
-
 	void saveMessageContexts(String userId);
 
+	/**
+	 * Save the user's all messages to local storage
+	 *
+	 */
+	void saveMessageContexts(String userId, List<MessageContext> messageContexts);
+
+	/**
+	 * Save the user's all connections to local storage
+	 *
+	 */
 	void saveConnectionContexts(String userId);
 
-	void saveConnectionList(String userId, List<ConnectionContext> list);
+	/**
+	 * Return all connections
+	 *
+	 */
+	List<ConnectionContext> getConnectionList();
 
-	List<ConnectionContext> getConnectionList(String roomId);
-
-	void updateConnection(String roomId, ConnectionContext connectionContext);
-
-	void updateConnections(String roomId, List<ConnectionContext> connectionContexts);
-
-	void updateMessage(String roomId, MessageContext messageContext);
+	/**
+	 * Add the message of one specific room to memory
+	 *
+	 */
+	void addMessage(String roomId, MessageContext messageContext);
 }

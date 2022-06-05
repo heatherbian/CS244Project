@@ -1,5 +1,7 @@
 package edu.cs244b.chat.gui;
 
+import edu.cs244b.chat.ChatManager;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -13,13 +15,21 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
+/**
+ * UI component to display login
+ *
+ */
+public class LoginInterface extends JPanel{
 
-public class LoginInterface {
-
-    public LoginInterface() throws IOException {
-        JFrame logIn = new JFrame ("Login to chatting room");
+    JFrame logIn;
+    public LoginInterface() {
+        logIn = new JFrame ("Login to chatting room");
         logIn.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        
+
+        //roomID Panel
+        JPanel roomIdPanel = new JPanel();
+        roomIdPanel.add(new JLabel(""));
+        roomIdPanel.setBackground(new Color(229, 255, 204));
     
         //userName Panel
         JPanel userNamePanel = new JPanel();
@@ -28,58 +38,47 @@ public class LoginInterface {
         JTextField userNameText = new JTextField(20);
         userNamePanel.add(userNameLabel);
         userNamePanel.add(userNameText);
-    
-        //roomID Panel
-        JPanel roomIdPanel = new JPanel();
-        roomIdPanel.add(new JLabel("RoomId"));
-        roomIdPanel.setBackground(new Color(229, 255, 204));
-        roomIdPanel.add(new JTextField (20));
 
         // image login button
         JPanel loginPanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
         loginPanel.setBackground(new Color(204, 255, 229));
         String IMG_PATH = "src/main/resources/login.jpg";
-        BufferedImage inputImage = ImageIO.read(new File(IMG_PATH));
-        BufferedImage newImage = new BufferedImage(100, 100, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage inputImage = null;
+        try {
+            inputImage = ImageIO.read(new File(IMG_PATH));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        BufferedImage newImage = new BufferedImage(50, 50, BufferedImage.TYPE_INT_ARGB);
         Graphics g = newImage.getGraphics();  // get its graphics object
-        g.drawImage(inputImage, 0, 0, 100, 100, null);
+        g.drawImage(inputImage, 0, 0, 50, 50, null);
         g.dispose(); 
         Icon newIcon = new ImageIcon(newImage);
         JButton imageLoginButton = new JButton(newIcon);
         loginPanel.add(imageLoginButton);
 
-        //Login event
-        /*class ClickListener implements ActionListener {
-            public void actionPerformed(ActionEvent e) {
-                // Todo: call api, login method, POST user id and room id!!!!
-                System.out.println("Clicked!");
-            }
-         }
-
-        //Add click event for the login button
-        loginButton.addActionListener(new ClickListener());
-        loginButton.doClick();*/
         imageLoginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                System.out.println("Clicked!");
+                String userId = userNameText.getText();
+                if(!ChatManager.addrMap.containsKey(userId))
+                    return;
                 try {
-                    UserList userList = new UserList();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
+                    new ChatManager(userId);
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                    return;
                 }
                 logIn.setVisible(false);
             }
         });
-        
 
-        //VerticalBox
         Box box = Box.createVerticalBox();
-        box.add(userNamePanel);
         box.add(roomIdPanel);
+        box.add(userNamePanel);
         box.add(loginPanel);
         logIn.setContentPane(box);
         logIn.pack();
-        logIn.setLocationRelativeTo(null);; 
+        logIn.setLocationRelativeTo(null);;
         logIn.setVisible(true);
     }   
 }
