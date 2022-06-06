@@ -37,7 +37,7 @@ public class ViewController extends JFrame implements IGUIHandler, IMessageNotif
         contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
         setContentPane(contentPane);
         contentPane.setLayout(null);
-        panel.setBounds(0, 0, 400, 600);
+        panel.setBounds(0, 0, 400, 570);
         contentPane.add(panel);
         panel.setLayout(cardLayout);
         cardLayout.show(panel, "p1");
