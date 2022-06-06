@@ -26,3 +26,7 @@ hs_err_pid*
 # IDE generated files
 *.iml
 /.idea
+/target
+
+# local storage
+*_message.json
