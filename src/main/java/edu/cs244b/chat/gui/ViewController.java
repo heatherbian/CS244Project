@@ -99,7 +99,7 @@ public class ViewController extends JFrame implements IGUIHandler, IMessageNotif
             roomMap.put(room.getRoomId(), chatRoom);
         }
         if (room.getRoomName().equals(currentRoomName))
-            chatRoom.showMessage(messageContext, false);
+            chatRoom.loadMessages(messageHandler.getAllMessagesFromRoom(room.getRoomId()));
     }
 
     class ViewWindowListener implements WindowListener {

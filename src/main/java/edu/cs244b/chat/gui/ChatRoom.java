@@ -110,6 +110,7 @@ public class ChatRoom extends JPanel {
     public void loadMessages(List<MessageContext> messageList){
         if(messageList == null)
             return;
+        chatContent.setText("");
         messageList.forEach(msg ->{
             if(msg.getOwnerId().equals(ChatManager.userId))
                 showMessage(msg, true);
@@ -119,7 +120,7 @@ public class ChatRoom extends JPanel {
     }
 
     public void showMessage(MessageContext messageContext, boolean isSelf) {
-        System.out.println("----ChatRoom-----showMessage: roomId="+messageContext.getRoomId() + ", msg="+messageContext.getMessageContent());
+//        System.out.println("----ChatRoom-----showMessage: roomId="+messageContext.getRoomId() + ", msg="+messageContext.getMessageContent());
         if (isSelf) {
             chatContent.append(messageContext.getMessageContent()+ " " + Utils.getDate(messageContext.getTimestamp())+"\n",true);
         }

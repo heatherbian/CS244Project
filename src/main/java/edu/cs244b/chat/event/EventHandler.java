@@ -41,10 +41,6 @@ public class EventHandler implements IEventHandler {
 
 	@Override
 	public MessageRequest analyzeMessage(List<MessageContext> messageContext, String userId) {
-		System.out.println("Event handler received messages. Number of msgs: " + messageContext.size() + ".");
-		for (MessageContext msg : messageContext) {
-			System.out.println(msg);
-		}
 		// Divide incoming messages by room id
 		HashMap<String, List<MessageContext>> messagesByRoomId = new HashMap<>();
 		for (MessageContext message : messageContext) {
@@ -60,13 +56,18 @@ public class EventHandler implements IEventHandler {
 				System.out.println("Warning!!! Unknown roomId in the input analyzeMessage");
 				continue;
 			}
-			AddMessagesToEventGraph(rooms.get(roomId).eventGraph, messagesByRoomId.get(roomId));
+			boolean needSync = AddMessagesToEventGraph(rooms.get(roomId).eventGraph, messagesByRoomId.get(roomId));
+			if (needSync) {
+				System.out.println("Need Sync because received incomplete message");
+				needMessageSyc = true;
+			}
 		}
 
 		// Generate message request
-		if(needMessageSyc) {
+		if(needMessageSyc && !userId.equals("storage")) {
 			// The instance has just started.
 			needMessageSyc = false;
+			System.out.println("Sending message request when running");
 			return new MessageRequest(true, true,null);
 		}
 		return new MessageRequest(false, false,null);
@@ -75,7 +76,6 @@ public class EventHandler implements IEventHandler {
 	@Override
 	public List<MessageContext> handleNewMessage(MessageContext messageContext) {
 		// TODO Auto-generated method stub
-		System.out.println("Handling new message:" + messageContext.getOwnerId() + ":" + messageContext.getMessageContent());
 		List<MessageContext> messagesToSend = new ArrayList<>();
 		messagesToSend.addAll(HandleNewMessageInternal(messageContext));
 		return messagesToSend;
@@ -108,13 +108,10 @@ public class EventHandler implements IEventHandler {
 	public List<MessageContext> getAllMessagesFromRoom(String roomId) {
 		ArrayList<MessageContext> messageContexts = new ArrayList<>();
 		Room room = rooms.get(roomId);
-		System.out.println(room.eventGraph.events.size());
 		for (Event event: room.eventGraph.events.values()) {
 			if(event.eventId.contains("root_event")){
 				continue;
 			}
-			System.out.println(room.userIds.toString());
-			System.out.println(event.parentEventIds.toString());
 			messageContexts.add(new MessageContext(roomId, new ArrayList<>(room.userIds), event.senderId, new ArrayList<>(event.parentEventIds),
 					event.eventId, event.timestamp, event.depth, event.content));
 		}
@@ -130,7 +127,7 @@ public class EventHandler implements IEventHandler {
 		event.senderId = new_message.getOwnerId();
 		event.content = new_message.getMessageContent();
 		event.depth = room.eventGraph.maxDepth + 1;
-		event.parentEventIds = room.eventGraph.eventIdsByDepth.get(room.eventGraph.maxDepth);
+		event.parentEventIds = new HashSet<>(room.eventGraph.unlinkedEventsIds);
 		event.eventId = GenerateEventId(event.timestamp, event.senderId, event.content, event.depth);
 		room.eventGraph.AddEventToGraph(event);
 		MessageContext message_to_send = new MessageContext(room.roomId, room.userIds, event.senderId, new ArrayList<>(event.parentEventIds),
@@ -140,9 +137,13 @@ public class EventHandler implements IEventHandler {
 
     public HashMap<String, Room> rooms;
 
-	private void AddMessagesToEventGraph(EventGraph eventGraph, List<MessageContext> messages) {
-		System.out.println(messages);
+	private boolean AddMessagesToEventGraph(EventGraph eventGraph, List<MessageContext> messages) {
+		boolean needSync = false;
 		HashMap<String, Event> newEvents = MessagesToEvents(messages);
+		for(String eventId: eventGraph.pendingEvents.keySet()) {
+			newEvents.put(eventId, eventGraph.pendingEvents.get(eventId));
+		}
+		eventGraph.pendingEvents.clear();
 		List<Event> eventsSortedByDepth = new ArrayList<>(newEvents.values());
 		eventsSortedByDepth.sort(Comparator.comparingInt(e -> e.depth));
 
@@ -163,9 +164,11 @@ public class EventHandler implements IEventHandler {
 			} else {
 				if(!eventGraph.pendingEvents.containsKey(event.eventId)){
 					eventGraph.pendingEvents.put(event.eventId, event);
+					needSync = true;
 				}
 			}
 		}
+		return needSync;
 	}
 
 	private HashMap<String, Event> MessagesToEvents(List<MessageContext> messages) {
@@ -196,6 +199,8 @@ public class EventHandler implements IEventHandler {
 
 		public  HashMap<String, Event> pendingEvents;
 
+		public HashSet<String> unlinkedEventsIds;
+
 		// It is presumed that the event is a valid event to be appended to the graph, i.e., the parents of the event
 		// are already incorporated into the graph.
 		public void AddEventToGraph(Event newEvent) {
@@ -205,12 +210,10 @@ public class EventHandler implements IEventHandler {
 				eventIdsByDepth.put(depth, new HashSet<>());
 			}
 			eventIdsByDepth.get(depth).add(newEvent.eventId);
-			newEvent.parentEventIds = eventIdsByDepth.get(depth - 1);
-			if (depth < maxDepth) {
-				for(String nextLevelEventId : eventIdsByDepth.get(depth + 1)) {
-					events.get(nextLevelEventId).parentEventIds.add(newEvent.eventId);
-				}
+			for(String parentId : newEvent.parentEventIds) {
+				unlinkedEventsIds.remove(parentId);
 			}
+			unlinkedEventsIds.add(newEvent.eventId);
 			maxDepth = Math.max(depth, maxDepth);
 		}
 
@@ -220,6 +223,7 @@ public class EventHandler implements IEventHandler {
 			maxDepth = 0;
 			unknownEventIds = new HashSet<>();
 			pendingEvents = new HashMap<>();
+			unlinkedEventsIds = new HashSet<>();
 
 			// Add the root event to the event graph.
 			Event root_event = new Event();
@@ -233,6 +237,7 @@ public class EventHandler implements IEventHandler {
 			events.put(root_event.eventId, root_event);
 			eventIdsByDepth.put(0, new HashSet<>());
 			eventIdsByDepth.get(0).add(root_event.eventId);
+			unlinkedEventsIds.add(root_event.eventId);
 		}
 	}
 

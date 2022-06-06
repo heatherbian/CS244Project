@@ -31,12 +31,12 @@ public class MessageMonitor implements IMessageMonitor {
         for(ConnectionContext conn: connList) {
             buildConnection(conn);
         }
-        try {
-            Thread.sleep(2000);
-        } catch(InterruptedException ex) {
-            Thread.currentThread().interrupt();
-        }
-        messageHandler.sendMessageRequest(new MessageRequest(true, true, null));
+        new Thread(()->{
+            try {
+                Thread.sleep(5000);
+            } catch (Exception e) {}
+            messageHandler.sendMessageRequest(new MessageRequest(true, true, null));
+        }).start();
     }
 
     @Override

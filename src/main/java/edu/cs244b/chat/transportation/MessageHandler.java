@@ -42,13 +42,14 @@ public class MessageHandler implements IMessageHandler, IMessagePublisher{
         }
 
         MessageRequest request = eventHandler.analyzeMessage((Arrays.asList(message)), message.getOwnerId());
+        // Save messages to storage.
+        List<MessageContext> allMsgs = eventHandler.getAllMessages();
+        storageHandler.saveMessageContexts(ChatManager.userId, allMsgs);
+
         if (!request.needMessagesFromOtherServers)
             return;
         Gson gson = new Gson();
         messageSender.sendMessage(gson.toJson(request));
-        // Save messages to storage.
-        List<MessageContext> allMsgs = eventHandler.getAllMessages();
-        storageHandler.saveMessageContexts(ChatManager.userId, allMsgs);
     }
 
     @Override
@@ -90,6 +91,7 @@ public class MessageHandler implements IMessageHandler, IMessagePublisher{
 
     @Override
     public void handleMessageRequest(MessageRequest messageRequest) {
+        System.out.println("----Received Message Request----");
         List<MessageContext> msgs = eventHandler.handleMessageRequest(messageRequest);
         broadcastMessages(msgs);
     }
@@ -97,8 +99,14 @@ public class MessageHandler implements IMessageHandler, IMessagePublisher{
     @Override
     public void broadcastMessages(List<MessageContext> messageContexts) {
         Gson gson = new Gson();
-        for(MessageContext messageContext: messageContexts)
+        for(MessageContext messageContext: messageContexts) {
             messageSender.sendMessage(gson.toJson(messageContext));
+            try {
+                Thread.sleep(100);
+            } catch (InterruptedException ex) {
+                Thread.currentThread().interrupt();
+            }
+        }
     }
 
     @Override
