@@ -13,7 +13,7 @@ import java.util.*;
 public class MessageHandler implements IMessageHandler, IMessagePublisher{
 
     // TODO control whether use EventHandler or not
-    private boolean disableEventHandler = true;
+    private boolean disableEventHandler = false;
 
 
     private IStorageHandler storageHandler;

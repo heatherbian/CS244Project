@@ -76,8 +76,8 @@ public class ChatRoom extends JPanel {
                 String content = inputField.getText();
                 if (content != null) {
                     // TODO The place where the message context is created
-                    List<String> userIds = new LinkedList<>();
-                    List<String> parentMessageId = new LinkedList<>();
+                    List<String> userIds = null;
+                    List<String> parentMessageId = null;
                     long messageId = System.currentTimeMillis();
                     Timestamp timestamp = new Timestamp(messageId);
                     // TODO please notice the passed parameters, depth is 0, parentMessageId is empty
@@ -121,11 +121,11 @@ public class ChatRoom extends JPanel {
     public void showMessage(MessageContext messageContext, boolean isSelf) {
         System.out.println("----ChatRoom-----showMessage: roomId="+messageContext.getRoomId() + ", msg="+messageContext.getMessageContent());
         if (isSelf) {
-            chatContent.append(messageContext.getMessageContent()+ " " + Utils.getDate(Long.valueOf(messageContext.getMessageId()))+"\n",true);
+            chatContent.append(messageContext.getMessageContent()+ " " + Utils.getDate(messageContext.getTimestamp())+"\n",true);
         }
         else {
             String message = "["+messageContext.getOwnerId()+"]:"+messageContext.getMessageContent();
-            chatContent.append(message+" " +Utils.getDate(Long.valueOf(messageContext.getMessageId()))+"\n", false);
+            chatContent.append(message+" " +Utils.getDate(messageContext.getTimestamp())+"\n", false);
         }
     }
 

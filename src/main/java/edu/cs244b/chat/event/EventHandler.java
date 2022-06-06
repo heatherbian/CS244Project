@@ -41,11 +41,15 @@ public class EventHandler implements IEventHandler {
 
 	@Override
 	public MessageRequest analyzeMessage(List<MessageContext> messageContext, String userId) {
-		// ReceiveMessages
+		System.out.println("Event handler received messages. Number of msgs: " + messageContext.size() + ".");
+		for (MessageContext msg : messageContext) {
+			System.out.println(msg);
+		}
+		// Divide incoming messages by room id
 		HashMap<String, List<MessageContext>> messagesByRoomId = new HashMap<>();
 		for (MessageContext message : messageContext) {
 			String roomId = message.getRoomId();
-			if (!messageContext.contains(roomId)) {
+			if (!messagesByRoomId.containsKey(roomId)) {
 				messagesByRoomId.put(roomId, new ArrayList<>());
 			}
 			List<MessageContext> messages = messagesByRoomId.get(roomId);
@@ -71,6 +75,7 @@ public class EventHandler implements IEventHandler {
 	@Override
 	public List<MessageContext> handleNewMessage(MessageContext messageContext) {
 		// TODO Auto-generated method stub
+		System.out.println("Handling new message:" + messageContext.getOwnerId() + ":" + messageContext.getMessageContent());
 		List<MessageContext> messagesToSend = new ArrayList<>();
 		messagesToSend.addAll(HandleNewMessageInternal(messageContext));
 		return messagesToSend;
@@ -87,36 +92,34 @@ public class EventHandler implements IEventHandler {
 		for (String roomId : rooms.keySet()) {
 			Room room = rooms.get(roomId);
 			for (Event event: room.eventGraph.events.values()) {
+				if(event.eventId.contains("root_event")){
+					continue;
+				}
 				messageContexts.add(new MessageContext(roomId, new ArrayList<>(room.userIds), event.senderId, new ArrayList<>(event.parentEventIds),
 						event.eventId, event.timestamp, event.depth, event.content));
 			}
 		}
+		Collections.sort(messageContexts);
 		return messageContexts;
 	}
 
 	@Override
 	public List<MessageContext> getAllMessagesFromRoom(String roomId) {
-		LinkedList<MessageContext> messageContexts = new LinkedList<>();
+		ArrayList<MessageContext> messageContexts = new ArrayList<>();
 		Room room = rooms.get(roomId);
+		System.out.println(room.eventGraph.events.size());
 		for (Event event: room.eventGraph.events.values()) {
+			if(event.eventId.contains("root_event")){
+				continue;
+			}
+			System.out.println(room.userIds.toString());
+			System.out.println(event.parentEventIds.toString());
 			messageContexts.add(new MessageContext(roomId, new ArrayList<>(room.userIds), event.senderId, new ArrayList<>(event.parentEventIds),
 					event.eventId, event.timestamp, event.depth, event.content));
 		}
+		Collections.sort(messageContexts);
 		return messageContexts;
 	}
-
-	public List<MessageContext> ConvertAllRoomsToMessageContexts() {
-        LinkedList<MessageContext> messageContexts = new LinkedList<>();
-        for (String roomId : rooms.keySet()) {
-            Room room = rooms.get(roomId);
-            for (Event event: room.eventGraph.events.values()) {
-                messageContexts.add(new MessageContext(roomId, new ArrayList<>(room.userIds), event.senderId, new ArrayList<>(event.parentEventIds),
-                        event.eventId, event.timestamp, event.depth, event.content));
-            }
-        }
-        return messageContexts;
-    }
-
 
 	// The new_message argument is supposed to have the timestamp, owner_id, message content and the room id.
 	public List<MessageContext> HandleNewMessageInternal(MessageContext new_message) {
@@ -131,12 +134,13 @@ public class EventHandler implements IEventHandler {
 		room.eventGraph.AddEventToGraph(event);
 		MessageContext message_to_send = new MessageContext(room.roomId, room.userIds, event.senderId, new ArrayList<>(event.parentEventIds),
 				event.eventId, event.timestamp, event.depth, event.content);
-		return Arrays.asList(new_message);
+		return Arrays.asList(message_to_send);
 	}
 
     public HashMap<String, Room> rooms;
 
 	private void AddMessagesToEventGraph(EventGraph eventGraph, List<MessageContext> messages) {
+		System.out.println(messages);
 		HashMap<String, Event> newEvents = MessagesToEvents(messages);
 		List<Event> eventsSortedByDepth = new ArrayList<>(newEvents.values());
 		eventsSortedByDepth.sort(Comparator.comparingInt(e -> e.depth));
