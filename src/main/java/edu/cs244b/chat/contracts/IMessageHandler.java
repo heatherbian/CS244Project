@@ -36,4 +36,10 @@ public interface IMessageHandler {
      *
      */
     void handleMessageRequest(MessageRequest messageRequest);
+
+    /**
+     * Send a MessageRequest to other servers.
+     *
+     */
+    void sendMessageRequest(MessageRequest messageRequest);
 }

@@ -31,6 +31,12 @@ public class MessageMonitor implements IMessageMonitor {
         for(ConnectionContext conn: connList) {
             buildConnection(conn);
         }
+        try {
+            Thread.sleep(2000);
+        } catch(InterruptedException ex) {
+            Thread.currentThread().interrupt();
+        }
+        messageHandler.sendMessageRequest(new MessageRequest(true, true, null));
     }
 
     @Override
@@ -69,13 +75,14 @@ public class MessageMonitor implements IMessageMonitor {
         void buildConn(ConnectionContext conn){
             Socket socket = null;
             try {
-                System.out.println("++++++++++Try to connect "+conn.getUserId()+"++++++++++++.");
+                // System.out.println("++++++++++Try to connect "+conn.getUserId()+"++++++++++++.");
                 socket = new Socket(conn.getHostName(), conn.getPort());
                 PeerListener peerListener = new PeerListener(conn, socket, transportationHandler, roomObserver);
                 peerListener.start();
                 interrupt();
             } catch (Exception e) {
-                e.printStackTrace();
+                // Suppress connection error message
+                // e.printStackTrace();
                 if (socket != null) {
                     try {
                         socket.close();
@@ -83,12 +90,13 @@ public class MessageMonitor implements IMessageMonitor {
                         ex.printStackTrace();
                     }
                 }
-                System.out.println("=============Try to reconnect "+conn.getUserId()+"==============.");
+                // System.out.println("=============Try to reconnect "+conn.getUserId()+"==============.");
                 try {
                     Thread.sleep(3000);
                     buildConn(conn);
                 } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                    // Suppress connection error message
+                    // ex.printStackTrace();
                     buildConn(conn);
                 }
             }

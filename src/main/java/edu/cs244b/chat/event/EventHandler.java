@@ -83,6 +83,7 @@ public class EventHandler implements IEventHandler {
 
 	@Override
 	public List<MessageContext> handleMessageRequest(MessageRequest messageRequest) {
+		System.out.println("Received Message Request");
 		return getAllMessages();
 	}
 

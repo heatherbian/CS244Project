@@ -46,6 +46,9 @@ public class MessageHandler implements IMessageHandler, IMessagePublisher{
             return;
         Gson gson = new Gson();
         messageSender.sendMessage(gson.toJson(request));
+        // Save messages to storage.
+        List<MessageContext> allMsgs = eventHandler.getAllMessages();
+        storageHandler.saveMessageContexts(ChatManager.userId, allMsgs);
     }
 
     @Override
@@ -58,6 +61,9 @@ public class MessageHandler implements IMessageHandler, IMessagePublisher{
 
         List<MessageContext> msgs = eventHandler.handleNewMessage(message);
         broadcastMessages(msgs);
+        // Save messages to storage.
+        List<MessageContext> allMsgs = eventHandler.getAllMessages();
+        storageHandler.saveMessageContexts(ChatManager.userId, allMsgs);
     }
 
     @Override
@@ -93,5 +99,14 @@ public class MessageHandler implements IMessageHandler, IMessagePublisher{
         Gson gson = new Gson();
         for(MessageContext messageContext: messageContexts)
             messageSender.sendMessage(gson.toJson(messageContext));
+    }
+
+    @Override
+    public void sendMessageRequest(MessageRequest messageRequest) {
+        if (!messageRequest.needMessagesFromOtherServers)
+            return;
+        Gson gson = new Gson();
+        System.out.println("Sending message request on start");
+        messageSender.sendMessage(gson.toJson(messageRequest));
     }
 }
