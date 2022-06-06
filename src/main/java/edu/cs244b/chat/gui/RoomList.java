@@ -53,11 +53,14 @@ public class RoomList extends JPanel {
         roomList.setBounds(0,0,400, 550);
 
         JPanel bottomPanel = new JPanel();
-        JButton networkButton = new JButton("Network Switch");
+        String statusStr = ChatManager.networkOn ? "Connected":"Disconnected";
+        JButton networkButton = new JButton("Network " + statusStr);
         networkButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 ChatManager.networkOn = !ChatManager.networkOn;
+                String statusStr = ChatManager.networkOn ? "Connected":"Disconnected";
+                networkButton.setText("Network " + statusStr);
                 System.out.println("Current network status is: " + ChatManager.networkOn);
             }
         });
