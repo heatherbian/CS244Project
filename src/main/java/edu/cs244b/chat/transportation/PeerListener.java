@@ -34,6 +34,9 @@ public class PeerListener extends Thread{
                 try {
                     System.out.println("+++++MessageReceiver connUserId="+connectionContext.getUserId()+", receive msg=["+jsonObject.toString()+"]");
                     MessageContext messageContext = gson.fromJson(jsonObject.toString(), MessageContext.class);
+                    if (jsonObject.toString().contains("needMessagesFromOtherServers")) {
+                        throw new JsonSyntaxException("The type is MessageRequest");
+                    }
                     transportationHandler.acceptMessageContext(messageContext);
                     roomObserver.notifyNewMessage(messageContext);
                 } catch (JsonSyntaxException jsonExp) {
