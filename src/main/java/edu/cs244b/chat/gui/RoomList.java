@@ -7,6 +7,8 @@ import edu.cs244b.chat.model.RoomListModel;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -19,7 +21,6 @@ public class RoomList extends JPanel {
 
     public RoomList(IGUIHandler handler, RoomListModel roomListModel) {
 
-        JList roomList = new JList(roomListModel);
         setLayout(new BorderLayout());
 
         JPanel topPanel = new JPanel();
@@ -29,6 +30,7 @@ public class RoomList extends JPanel {
         topPanel.add(info);
         topPanel.setBackground(new Color(229,255, 204));;
 
+        JList roomList = new JList(roomListModel);
         roomList.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         roomList.setFont(new Font("Serif", Font.BOLD, 18));
         roomList.setFocusable(false);
@@ -49,7 +51,21 @@ public class RoomList extends JPanel {
         DefaultListCellRenderer renderer =  (DefaultListCellRenderer)roomList.getCellRenderer();  
         renderer.setHorizontalAlignment(JLabel.CENTER);  
         roomList.setBounds(0,0,400, 550);
+
+        JPanel bottomPanel = new JPanel();
+        JButton networkButton = new JButton("Network Switch");
+        networkButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                ChatManager.networkOn = !ChatManager.networkOn;
+                System.out.println("Current network status is: " + ChatManager.networkOn);
+            }
+        });
+        bottomPanel.setBackground(new Color(229,255, 204));;
+        bottomPanel.add(networkButton);
+
         add(topPanel, BorderLayout.NORTH);
         add(roomList, BorderLayout.CENTER);
+        add(bottomPanel, BorderLayout.SOUTH);
     }  
 }

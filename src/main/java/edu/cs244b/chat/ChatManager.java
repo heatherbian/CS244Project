@@ -19,9 +19,11 @@ public class ChatManager {
 
 	public static String userId;
 	public static String portNum;
+	public static boolean networkOn;
 	public static Map<String, String> addrMap = Map.of("Shaohui", "10001", "Henry", "10002", "Jingyi", "10003");
 
 	public static void main(String[] args) throws Exception{
+		networkOn = true;
 		LoginInterface p1=new LoginInterface();
 		p1.setVisible(true);
 	}

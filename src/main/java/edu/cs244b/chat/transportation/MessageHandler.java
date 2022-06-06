@@ -41,6 +41,11 @@ public class MessageHandler implements IMessageHandler, IMessagePublisher{
             return;
         }
 
+        if (!ChatManager.networkOn){
+            System.out.println("Network conn status is: " + ChatManager.networkOn + ", so skip the received message=[" + message.toString()+"]");
+            return;
+        }
+
         MessageRequest request = eventHandler.analyzeMessage((Arrays.asList(message)), message.getOwnerId());
         // Save messages to storage.
         List<MessageContext> allMsgs = eventHandler.getAllMessages();
@@ -92,12 +97,22 @@ public class MessageHandler implements IMessageHandler, IMessagePublisher{
     @Override
     public void handleMessageRequest(MessageRequest messageRequest) {
         System.out.println("----Received Message Request----");
+        if (!ChatManager.networkOn){
+            System.out.println("Network conn status is: " + ChatManager.networkOn + ", so skip the received messageRequest=[" + messageRequest.toString()+"]");
+            return;
+        }
+
         List<MessageContext> msgs = eventHandler.handleMessageRequest(messageRequest);
         broadcastMessages(msgs);
     }
 
     @Override
     public void broadcastMessages(List<MessageContext> messageContexts) {
+        if (!ChatManager.networkOn){
+            System.out.println("Network conn status is: " + ChatManager.networkOn + ", so skip broadcasting Messages");
+            return;
+        }
+
         Gson gson = new Gson();
         for(MessageContext messageContext: messageContexts) {
             messageSender.sendMessage(gson.toJson(messageContext));
@@ -111,6 +126,11 @@ public class MessageHandler implements IMessageHandler, IMessagePublisher{
 
     @Override
     public void sendMessageRequest(MessageRequest messageRequest) {
+        if (!ChatManager.networkOn){
+            System.out.println("Network conn status is: " + ChatManager.networkOn + ", so skip sending the messageRequest=[" + messageRequest.toString()+"]");
+            return;
+        }
+
         if (!messageRequest.needMessagesFromOtherServers)
             return;
         Gson gson = new Gson();
