@@ -42,4 +42,9 @@ public interface IMessageHandler {
      *
      */
     void sendMessageRequest(MessageRequest messageRequest);
+
+    /**
+     * Send all history to other servers
+     */
+    void sendAllMessages();
 }

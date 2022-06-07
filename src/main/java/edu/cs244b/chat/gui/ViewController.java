@@ -48,7 +48,7 @@ public class ViewController extends JFrame implements IGUIHandler, IMessageNotif
     @Override
     public void showRoomList() {
 
-        RoomList p2 = new RoomList(this, new RoomListModel(storageHandler.getRoomList()));
+        RoomList p2 = new RoomList(this, new RoomListModel(storageHandler.getRoomList()), messageHandler);
         panel.add(p2, "p2");
         cardLayout.show(panel, "p2");
     }

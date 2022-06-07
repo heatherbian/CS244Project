@@ -137,4 +137,10 @@ public class MessageHandler implements IMessageHandler, IMessagePublisher{
         System.out.println("Sending message request on start");
         messageSender.sendMessage(gson.toJson(messageRequest));
     }
+
+    @Override
+    public void sendAllMessages() {
+        List<MessageContext> allMsgs = eventHandler.getAllMessages();
+        broadcastMessages(allMsgs);
+    }
 }

@@ -2,8 +2,11 @@ package edu.cs244b.chat.gui;
 
 import edu.cs244b.chat.ChatManager;
 import edu.cs244b.chat.contracts.IGUIHandler;
+import edu.cs244b.chat.contracts.IMessageHandler;
+import edu.cs244b.chat.model.MessageRequest;
 import edu.cs244b.chat.model.RoomContext;
 import edu.cs244b.chat.model.RoomListModel;
+import edu.cs244b.chat.transportation.MessageHandler;
 
 import javax.swing.*;
 import java.awt.*;
@@ -19,7 +22,9 @@ import javax.swing.event.ListSelectionListener;
  */
 public class RoomList extends JPanel {
 
-    public RoomList(IGUIHandler handler, RoomListModel roomListModel) {
+    public RoomList(IGUIHandler handler, RoomListModel roomListModel, IMessageHandler messageHandler) {
+
+        this.messageHandler = messageHandler;
 
         setLayout(new BorderLayout());
 
@@ -62,6 +67,10 @@ public class RoomList extends JPanel {
                 String statusStr = ChatManager.networkOn ? "Connected":"Disconnected";
                 networkButton.setText("Network " + statusStr);
                 System.out.println("Current network status is: " + ChatManager.networkOn);
+                if (ChatManager.networkOn) {
+                    messageHandler.sendAllMessages();
+//                    messageHandler.sendMessageRequest(new MessageRequest(true,true,null));
+                }
             }
         });
         bottomPanel.setBackground(new Color(229,255, 204));;
@@ -70,5 +79,7 @@ public class RoomList extends JPanel {
         add(topPanel, BorderLayout.NORTH);
         add(roomList, BorderLayout.CENTER);
         add(bottomPanel, BorderLayout.SOUTH);
-    }  
+    }
+
+    private IMessageHandler messageHandler;
 }
