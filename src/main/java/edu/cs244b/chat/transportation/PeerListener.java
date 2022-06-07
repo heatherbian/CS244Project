@@ -6,6 +6,7 @@ import edu.cs244b.chat.contracts.*;
 import edu.cs244b.chat.model.ConnectionContext;
 import edu.cs244b.chat.model.MessageContext;
 import edu.cs244b.chat.model.MessageRequest;
+import edu.cs244b.chat.model.MessageStruct;
 
 import javax.json.*;
 import java.io.BufferedReader;
@@ -31,18 +32,16 @@ public class PeerListener extends Thread{
                 System.out.println("!!!!!Peer= " + this.getName() + "!!!!! 1  connUserId="+connectionContext.getUserId());
                 JsonObject jsonObject = Json.createReader(bufferedReader).readObject();
                 Gson gson = new Gson();
-                try {
-                    System.out.println("+++++MessageReceiver connUserId="+connectionContext.getUserId()+", receive msg=["+jsonObject.toString()+"]");
-                    MessageContext messageContext = gson.fromJson(jsonObject.toString(), MessageContext.class);
-                    if (jsonObject.toString().contains("needMessagesFromOtherServers")) {
-                        throw new JsonSyntaxException("The type is MessageRequest");
+
+                System.out.println("+++++MessageReceiver connUserId="+connectionContext.getUserId()+", receive msg=["+jsonObject.toString()+"]");
+                MessageStruct msg = gson.fromJson(jsonObject.toString(), MessageStruct.class);
+                if(msg.isMessageContext) {
+                    for (MessageContext messageContext : msg.messageContexts) {
+                        transportationHandler.acceptMessageContext(messageContext);
+                        roomObserver.notifyNewMessage(messageContext);
                     }
-                    transportationHandler.acceptMessageContext(messageContext);
-                    roomObserver.notifyNewMessage(messageContext);
-                } catch (JsonSyntaxException jsonExp) {
-                    System.out.println("--------------JsonSyntaxException in MessageReceiver------Try MessageRequest-----------");
-                    MessageRequest messageRequest = gson.fromJson(jsonObject.toString(), MessageRequest.class);
-                    transportationHandler.acceptMessageRequest(messageRequest);
+                } else {
+                    transportationHandler.acceptMessageRequest(msg.messageRequest);
                 }
             } catch (Exception e) {
                 System.out.println("--------------Exception in MessageReceiver-----------------");

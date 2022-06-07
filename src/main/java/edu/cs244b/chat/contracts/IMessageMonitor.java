@@ -16,7 +16,7 @@ public interface IMessageMonitor {
 	 * Accept the MessageContext from peer
 	 *
 	 */
-	void acceptMessageContext(MessageContext messageContext);
+	void  acceptMessageContext(MessageContext messageContext);
 
 	/**
 	 * Accept the MessageRequest from peer

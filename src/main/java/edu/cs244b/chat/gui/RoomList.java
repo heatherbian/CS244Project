@@ -69,7 +69,7 @@ public class RoomList extends JPanel {
                 System.out.println("Current network status is: " + ChatManager.networkOn);
                 if (ChatManager.networkOn) {
                     messageHandler.sendAllMessages();
-//                    messageHandler.sendMessageRequest(new MessageRequest(true,true,null));
+                    messageHandler.sendMessageRequest(new MessageRequest(true,true,null));
                 }
             }
         });

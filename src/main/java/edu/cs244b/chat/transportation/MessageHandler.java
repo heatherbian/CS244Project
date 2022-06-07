@@ -6,6 +6,7 @@ import edu.cs244b.chat.contracts.*;
 import edu.cs244b.chat.event.EventHandler;
 import edu.cs244b.chat.model.MessageContext;
 import edu.cs244b.chat.model.MessageRequest;
+import edu.cs244b.chat.model.MessageStruct;
 import edu.cs244b.chat.model.RoomContext;
 
 import java.util.*;
@@ -54,7 +55,7 @@ public class MessageHandler implements IMessageHandler, IMessagePublisher{
         if (!request.needMessagesFromOtherServers)
             return;
         Gson gson = new Gson();
-        messageSender.sendMessage(gson.toJson(request));
+        messageSender.sendMessage(gson.toJson(new MessageStruct(request)));
     }
 
     @Override
@@ -114,14 +115,15 @@ public class MessageHandler implements IMessageHandler, IMessagePublisher{
         }
 
         Gson gson = new Gson();
-        for(MessageContext messageContext: messageContexts) {
-            messageSender.sendMessage(gson.toJson(messageContext));
-            try {
-                Thread.sleep(100);
-            } catch (InterruptedException ex) {
-                Thread.currentThread().interrupt();
-            }
-        }
+        messageSender.sendMessage(gson.toJson(new MessageStruct(messageContexts)));
+//        for(MessageContext messageContext: messageContexts) {
+//            messageSender.sendMessage(gson.toJson(messageContext));
+//            try {
+//                Thread.sleep(100);
+//            } catch (InterruptedException ex) {
+//                Thread.currentThread().interrupt();
+//            }
+//        }
     }
 
     @Override
@@ -135,7 +137,7 @@ public class MessageHandler implements IMessageHandler, IMessagePublisher{
             return;
         Gson gson = new Gson();
         System.out.println("Sending message request on start");
-        messageSender.sendMessage(gson.toJson(messageRequest));
+        messageSender.sendMessage(gson.toJson(new MessageStruct(messageRequest)));
     }
 
     @Override

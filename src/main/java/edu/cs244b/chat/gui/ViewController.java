@@ -1,5 +1,6 @@
 package edu.cs244b.chat.gui;
 
+import edu.cs244b.chat.ChatManager;
 import edu.cs244b.chat.contracts.*;
 import edu.cs244b.chat.model.MessageContext;
 import edu.cs244b.chat.model.RoomContext;
@@ -86,6 +87,9 @@ public class ViewController extends JFrame implements IGUIHandler, IMessageNotif
 
     @Override
     public void notifyNewMessage(MessageContext messageContext) {
+        if(!ChatManager.networkOn){
+            return;
+        }
         ChatRoom chatRoom = null;
         RoomContext room = storageHandler.getRoom(messageContext.getRoomId());
         if (room == null)
